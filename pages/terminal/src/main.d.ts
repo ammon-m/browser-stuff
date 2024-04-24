@@ -1,3 +1,3 @@
-export declare let motd: string;
+export declare function setMOTD(): void;
 
 export declare function init(): void;
