@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>terminal</title>
+        <style>
+            body {
+                margin: 0;
+            }
+            html {
+                background-color: black;
+            }
+            .container {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                image-rendering: crisp-edges;
+            }
+        </style>
+        <script>
+            import * as main from "./src/main.js"
+
+            window.addEventListener("DOMContentLoaded", event => {
+                main.motd = "hello world"
+                try {
+                    main.init()
+                }
+                catch(error)
+                {
+                    console.error(error)
+                }
+            })
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <canvas id="canvas" width="1032" height="553"></canvas>
+        </div>
+    </body>
+</html>
