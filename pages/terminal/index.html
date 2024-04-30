@@ -25,7 +25,8 @@
                 color: #c0c0c0;
                 background-color: #181818;
                 padding-left: 2ch;
-                overflow-y: hidden;
+                overflow-y: scroll;
+                scrollbar-width: 0;
                 text-wrap: wrap;
                 word-wrap: normal;
                 text-overflow: clip;
@@ -39,9 +40,9 @@
                 background-color: #101010;
             }
             #input {
-                width: calc(100% - 2ch - 8px);
+                width: calc(100% - 2ch - 4px);
                 height: 100%;
-                padding: 2px 4px;
+                padding: 2px 4px 2px 0;
                 border: none;
                 outline: none;
                 background: none;
@@ -68,7 +69,7 @@
         <div id="main">
             <div class="container" id="output"></div>
             <div class="container" id="input-container">
-                <span style="float: left; display: block; color: #c0c0c0; padding: 1px 2px; cursor: default">&gt;&nbsp;</span>
+                <span style="float: left; display: block; color: #c0c0c0; padding: 1px 0 1px 2px; cursor: default">&gt;&nbsp;</span>
                 <input id="input" type="text" autocomplete="off" autofocus>
             </div>
         </div>

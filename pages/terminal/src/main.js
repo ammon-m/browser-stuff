@@ -24,6 +24,10 @@ function init(motd)
     input.setAttribute("pattern", "[\\w,\\.\\{\\}\\[\\]=\\-_!~^*@\"'`#$%&\\/\\\\ ]+")
     // basically any ascii character except newlines
 
+    input.addEventListener("input", event => {
+        commandHistoryPos = commandHistory.length
+    })
+
     window.addEventListener("keydown", event => {
         if(event.key == "Enter")
         {
