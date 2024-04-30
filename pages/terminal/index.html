@@ -35,7 +35,7 @@
                 background-color: #101010;
             }
             #input {
-                width: calc(100% - 2ch);
+                width: calc(100% - 2ch - 8px);
                 height: 100%;
                 padding: 2px 4px;
                 border: none;
@@ -47,7 +47,7 @@
                 text-wrap: nowrap;
                 overflow-x: scroll;
                 scrollbar-width: 0;
-                float: right;
+                float: left;
             }
             #input:active {
                 color: white;
@@ -62,7 +62,7 @@
         <div id="main">
             <div class="container" id="output"></div>
             <div class="container" id="input-container">
-                <span style="float: left;">&gt;&nbsp;</span>
+                <span style="float: left; display: block;">&gt;&nbsp;</span>
                 <input id="input" type="text" autocomplete="off" autofocus>
             </div>
         </div>
