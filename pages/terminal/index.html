@@ -7,6 +7,7 @@
             html {
                 background-color: #1f1f1f;
                 color: white;
+                font-size: 14px;
             }
             #main {
                 width: 100%;
@@ -43,13 +44,14 @@
                 background: none;
                 color: #c0c0c0;
                 font-family: 'Consolas', 'Courier New', Courier, monospace;
+                font-size: 14px;
                 overflow-y: hidden;
                 text-wrap: nowrap;
                 overflow-x: scroll;
                 scrollbar-width: 0;
                 float: left;
             }
-            #input:active {
+            #input:focus {
                 color: white;
             }
             span.line {
@@ -62,7 +64,7 @@
         <div id="main">
             <div class="container" id="output"></div>
             <div class="container" id="input-container">
-                <span style="float: left; display: block;">&gt;&nbsp;</span>
+                <span style="float: left; display: block; color: #c0c0c0;">&gt;&nbsp;</span>
                 <input id="input" type="text" autocomplete="off" autofocus>
             </div>
         </div>
