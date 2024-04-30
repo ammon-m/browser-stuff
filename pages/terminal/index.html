@@ -18,11 +18,10 @@
                 position: relative;
             }
             .container {
-                float: left;
                 display: block;
             }
             #output {
-                position: relative;
+                position: absolute;
                 bottom: calc(1em + 4px);
                 width: calc(100% - 2ch);
                 max-height: calc(100% - calc(1em + 4px));
@@ -35,6 +34,8 @@
                 text-overflow: clip;
             }
             #input-container {
+                position: absolute;
+                bottom: 0;
                 width: 100%;
                 height: calc(1em + 4px);
                 background-color: #101010;

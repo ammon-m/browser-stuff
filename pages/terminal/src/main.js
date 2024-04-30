@@ -89,4 +89,5 @@ function renderOutput()
         str += `<span class="line">${commandHistory[i]}</span>`
     }
     output.innerHTML = str
+    output.scrollTop = output.scrollHeight
 }
