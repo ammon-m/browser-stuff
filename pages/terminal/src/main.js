@@ -19,7 +19,7 @@ function init(motd)
 {
     if(motd) console.log(motd)
 
-    input.setAttribute("pattern", "[\\w,\\.\\{\\}\\[\\]=-_!~^*@\"'`#$%&\\/\\\\ ]+")
+    input.setAttribute("pattern", "[\\w,\\.\\{\\}\\[\\]=\\-_!~^*@\"'`#$%&\\/\\\\ ]+")
     // basically any ascii character except newlines
 
     window.addEventListener("keydown", event => {
