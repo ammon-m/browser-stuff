@@ -6,5 +6,5 @@ export enum CommandParserResult
 
 export class CommandParser
 {
-    static parse(value: string): CommandParserResult
+    parse(value: string): CommandParserResult
 }

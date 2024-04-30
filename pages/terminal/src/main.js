@@ -6,10 +6,6 @@ window.addEventListener("DOMContentLoaded", event => {
     init("hello world")
 })
 
-/**@type {string[]}*/
-let logLines = []
-
-const container = document.getElementById("container")
 const output = document.getElementById("output")
 /**@type {HTMLInputElement}*/
 const input = document.getElementById("input")
@@ -21,7 +17,7 @@ function init(motd)
 {
     if(motd) console.log(motd)
 
-    input.setAttribute("pattern", "[\\w,\\.\\{\\}\\[\\]=\\-_!~^*@\"'`#$%&\\/\\\\ ]+")
+    // input.setAttribute("pattern", "[\\w,\\.\\{\\}\\[\\]=\\-_!~^*@\"'`#$%&\\/\\\\ ]+")
     // basically any ascii character except newlines
 
     input.addEventListener("input", event => {
@@ -67,6 +63,7 @@ function receiveUserCommand(value)
 {
     if(!value || value == "") return;
 
+    log.submit(value)
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
 
@@ -74,19 +71,46 @@ function receiveUserCommand(value)
 
     renderOutput()
 
-    let result = CommandParser.parse()
+    const parser = new CommandParser()
+    let command = null
+
+    try
+    {
+        command = parser.parse(value)
+    }
+    catch(error)
+    {
+        console.log(error)
+        log.submit(error)
+        return;
+    }
+    if(command == null) return;
+
+    // yay command !!!
 }
 
 /**@type {string[]}*/
 const commandHistory = []
 let commandHistoryPos = 0
 
+/**@type {string[]}*/
+export const log = []
+log.submit = function(...items) {
+    let out = this.push(items.map(value => {
+        if(value.toString)
+            return value.toString()
+        return String(value)
+    }))
+    renderOutput()
+    return out
+}
+
 function renderOutput()
 {
     var str = ""
-    for(var i = 0; i < commandHistory.length; i++)
+    for(var i = 0; i < log.length; i++)
     {
-        str += `<span class="line">${commandHistory[i]}</span>`
+        str += `<span class="line">${log[i]}</span>`
     }
     output.innerHTML = str
     output.scrollTop = output.scrollHeight
