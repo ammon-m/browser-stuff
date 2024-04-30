@@ -65,17 +65,14 @@ function init(motd)
  */
 function receiveUserCommand(value)
 {
+    if(!value || value == "") return;
+
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
 
-    const line = document.createElement("span")
-    line.classList.add("line")
-    line.innerText = value
-    output.appendChild(line)
-
     input.value = ""
 
-    // parser.CommandParserResult.Success
+    renderOutput()
 
     let result = CommandParser.parse()
 }
@@ -83,3 +80,13 @@ function receiveUserCommand(value)
 /**@type {string[]}*/
 const commandHistory = []
 let commandHistoryPos = 0
+
+function renderOutput()
+{
+    var str = ""
+    for(var i = 0; i < commandHistory.length; i++)
+    {
+        str += `<span class="line">${commandHistory[i]}</span>`
+    }
+    output.innerHTML = str
+}

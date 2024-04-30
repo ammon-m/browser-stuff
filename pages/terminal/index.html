@@ -14,25 +14,25 @@
                 height: 100%;
                 image-rendering: crisp-edges;
                 font-family: 'Consolas', 'Courier New', Courier, monospace;
+                background-color: #181818;
+                position: relative;
             }
             .container {
                 float: left;
                 display: block;
             }
             #output {
+                position: relative;
+                bottom: calc(1em + 4px);
                 width: calc(100% - 2ch);
-                height: calc(100% - calc(1em + 4px));
+                max-height: calc(100% - calc(1em + 4px));
                 color: #c0c0c0;
-                background-color: #181818;
                 padding-left: 2ch;
                 overflow-y: scroll;
                 scrollbar-width: 0;
                 text-wrap: wrap;
                 word-wrap: normal;
                 text-overflow: clip;
-                display: flex;
-                justify-content: flex-end;
-                flex-direction: column-reverse;
             }
             #input-container {
                 width: 100%;
@@ -68,7 +68,7 @@
         <div id="main">
             <div class="container" id="output"></div>
             <div class="container" id="input-container">
-                <span style="float: left; display: block; color: #c0c0c0; padding: 2px calc(1ch - 2px) 2px 2px; cursor: default">&gt;</span>
+                <span style="float: left; display: block; color: #c0c0c0; padding: 1px calc(1ch - 2px) 1px 2px; cursor: default">&gt;</span>
                 <input id="input" type="text" autocomplete="off" autofocus>
             </div>
         </div>
