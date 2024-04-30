@@ -66,6 +66,7 @@ function receiveUserCommand(value)
 
     const line = document.createElement("span")
     line.classList.add("line")
+    line.innerText = value
     output.appendChild(line)
 
     input.value = ""
