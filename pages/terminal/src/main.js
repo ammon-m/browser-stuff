@@ -1,3 +1,4 @@
+import { CommandParser } from "./lib/CommandParser.js"
 import * as parser from "./lib/CommandParser.js"
 import * as minifs from "./lib/minifs.js"
 
@@ -10,10 +11,11 @@ let logLines = []
 
 const container = document.getElementById("container")
 const output = document.getElementById("output")
+/**@type {HTMLInputElement}*/
 const input = document.getElementById("input")
 
 /**
- * @param {string} motd 
+ * @param {string} motd
  */
 function init(motd)
 {
@@ -35,21 +37,42 @@ function init(motd)
                 document.activeElement.blur()
                 event.preventDefault()
             }
+            if(event.key == "ArrowUp")
+            {
+                if(--commandHistoryPos < 0) commandHistoryPos = 0
+                input.value = commandHistory[commandHistoryPos]
+                event.preventDefault()
+            }
+            if(event.key == "ArrowDown")
+            {
+                if(++commandHistoryPos > commandHistory.length) commandHistoryPos = commandHistory.length
+                if(commandHistoryPos == commandHistory.length)
+                    input.value = ""
+                else
+                    input.value = commandHistory[commandHistoryPos]
+                event.preventDefault()
+            }
         }
     })
 }
 
 /**
- * @param {string} value 
+ * @param {string} value
  */
 function receiveUserCommand(value)
 {
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
 
-    // CommandParser.CommandParserResult.Success
+    const line = document.createElement("span")
+    line.classList.add("line")
+    document.insertBefore(output, line)
 
-    let result = parser.CommandParser.parse()
+    input.value = ""
+
+    // parser.CommandParserResult.Success
+
+    let result = CommandParser.parse()
 }
 
 /**@type {string[]}*/
