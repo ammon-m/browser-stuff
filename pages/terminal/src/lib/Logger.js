@@ -11,6 +11,13 @@ export default class Logger
         this.onSubmit = onSubmit
     }
 
+    clear()
+    {
+        this.lines = []
+        this.entries = []
+        this.onSubmit(null)
+    }
+
     _log(_type)
     {
         Array.from(arguments).forEach((value, i) => {

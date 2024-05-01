@@ -93,8 +93,6 @@ function receiveUserCommand(value)
     if(command == null) return;
 
     command.execute()
-
-    console.log(command)
 }
 
 /**@type {string[]}*/
@@ -107,6 +105,8 @@ export const logger = new Logger((entries) => {
 
 function renderOutput(entries)
 {
+    if(!entries) { output.innerHTML = ""; return; }
+
     var str = ""
     for(var i = 0; i < entries.length; i++)
     {

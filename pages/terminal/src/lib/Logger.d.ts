@@ -6,6 +6,8 @@ export default class Logger
 
     constructor(onSubmit: (entries: LogEntry[]) => void)
 
+    clear(): void
+
     /**
      * Push an entry or several entries to the Logger instance
      * @param items

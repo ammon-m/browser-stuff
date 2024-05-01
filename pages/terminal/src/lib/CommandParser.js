@@ -75,13 +75,19 @@ const commandsList =
             .replaceAll(/on(\w+)\s*=\s*".*"/g, "")
             .replaceAll(/on(\w+)\s*=\s*'.*'/g, "")
         )
+    },
+
+    /** @param {CommandExecutionEvent} event */
+    clear: (event) => {
+        logger.clear()
     }
 }
 
 const commandsHelp =
 {
     help: "the ever helpful help command, helps you get some of that sweet help when you need it",
-    print: "prints the string as raw html to the log"
+    print: "prints the string as raw html to the log",
+    clear: "clears the log",
 }
 
 export class CommandParser
@@ -109,6 +115,10 @@ export class CommandParser
                 this.String(),
                 this.End(),
             ], commandsList.print);
+
+            case "clear": return new Command("clear", [
+                this.End(),
+            ], commandsList.clear);
         }
         throw new SyntaxError(`Unknown command '${name.value}'`)
     }
@@ -215,7 +225,7 @@ class Lexer
             if (e === null || e.index != 0)
                 continue;
 
-            token = new Token(_type, e[0], this.pos.clone());
+            token = new Token(_type, e[0]);
             break;
         }
 
@@ -236,7 +246,7 @@ class Lexer
             if (e === null || e.index != 0)
                 continue;
 
-            token = new Token(_type, e[0], this.pos.clone());
+            token = new Token(_type, e[0]);
             break;
         }
 
@@ -282,13 +292,11 @@ class Token
 {
     type = ""
     value = ""
-    pos
 
     constructor(_type, value, pos)
     {
         this.type = _type
         this.value = value
-        this.pos = pos
     }
 
     toString()
