@@ -1,8 +1,4 @@
-export const CommandParserResult =
-{
-    Success: 0,
-    Failure: 1
-}
+import { logger } from "../main.js";
 
 const tokenTypes = Object.freeze({
     opCurly: /\{/,
@@ -15,16 +11,77 @@ const tokenTypes = Object.freeze({
     string: /(?:".*"|'.*')/,
     literal: /[a-zA-Z_][a-zA-Z_0-9]*/,
     boolean: /true|false/,
+    question: /\?/,
+    EoL: /\s*$/,
 })
+
+class CommandExecutionEvent
+{
+    /**@type {Token[]} */
+    parameters = []
+
+    constructor(parameters)
+    {
+        this.parameters = parameters
+    }
+}
 
 class Command
 {
-    constructor(name, arguments)
+    /**@private */
+    callback;
+
+    /**
+     * @param {string} name 
+     * @param {any[]} parameters 
+     * @param {(event: CommandExecutionEvent) => any} callback 
+     */
+    constructor(name, parameters, callback = () => {})
     {
         this.type = "Command"
         this.name = name
-        this.arguments = arguments
+        this.parameters = parameters
+        this.callback = callback
     }
+
+    execute()
+    {
+        this.callback(new CommandExecutionEvent(this.parameters))
+    }
+}
+
+const commandsList =
+{
+    /** @param {CommandExecutionEvent} event */
+    help: (event) => {
+        const cmd = event.parameters[0]
+        if(cmd.type == "EoL")
+            logger.log("List of all available commands" + "<br>&nbsp;&nbsp;" + (Object.keys(commandsList).join("<br>&nbsp;&nbsp;"))
+            + "<br><br>Use help &lt;command> to learn more about a specific command")
+        else if(!commandsList.hasOwnProperty(cmd.value))
+            logger.error(new SyntaxError(`Unknown command '${cmd.value}'`))
+        else logger.log(commandsHelp[cmd.value])
+    },
+
+    /** @param {CommandExecutionEvent} event */
+    print: (event) => {
+        if(event.parameters[0].value == "")
+            logger.error(new SyntaxError("First argument of print cannot be an empty string"))
+        else logger.log(
+            event.parameters[0].value
+            .replaceAll("\\n", "<br>")
+            .replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+            .replaceAll(/<\/?script>/g, "")
+            .replaceAll(/on(\w+)\s*=\s*".*"/g, "")
+            .replaceAll(/on(\w+)\s*=\s*'.*'/g, "")
+        )
+    }
+}
+
+const commandsHelp =
+{
+    help: "the ever helpful help command, helps you get some of that sweet help when you need it",
+    print: "prints the string as raw html to the log"
 }
 
 export class CommandParser
@@ -39,13 +96,21 @@ export class CommandParser
 
     Command()
     {
-        const name = this.Literal()
+        let name = this.Literal()
+
         switch(name.value)
         {
+            case "help": return new Command("help", [
+                this.HelpCommandArgument(),
+                this.End(),
+            ], commandsList.help);
+
             case "print": return new Command("print", [
-                this.String()
-            ]);
+                this.String(),
+                this.End(),
+            ], commandsList.print);
         }
+        throw new SyntaxError(`Unknown command '${name.value}'`)
     }
 
     Literal()
@@ -57,12 +122,36 @@ export class CommandParser
         }
     }
 
+    Question()
+    {
+        const token = this.eat('question')
+        return {
+            type: "Operator",
+            value: token.value
+        }
+    }
+
+    HelpCommandArgument()
+    {
+        const token = this.eat('literal EoL')
+        return token
+    }
+
     String()
     {
         const token = this.eat('string')
         return {
             type: "String",
             value: token.value.slice(1, token.value.length - 1) // remove quotes
+        }
+    }
+
+    End()
+    {
+        const token = this.eat('EoL')
+        return {
+            type: "EoL",
+            value: token.value
         }
     }
 
@@ -74,17 +163,25 @@ export class CommandParser
         return this.lexer.nextToken()
     }
 
+    /**
+     * @param {string} tokenType
+     */
     eat(tokenType)
     {
+        let types = tokenType.split(" ")
         let token = this.lookAhead()
 
-        if(!token)
+        if(!token || (!types.includes(token.type) && token.type == 'EoL'))
             throw new SyntaxError(`Unexpected end of input`)
 
-        if(token.type == tokenType)
+        if(types.includes(token.type))
             return token
 
-        throw new SyntaxError(`Got ${token.value}, expected ${tokenType}`)
+        var expected = tokenType
+        if(types.length > 1)
+            expected = types.join(" | ")
+
+        throw new SyntaxError(`Unexpected symbol \`${token.value}\`, expected ${expected} (at position ${this.lexer.pos.index - 1})`)
     }
 }
 
@@ -123,7 +220,7 @@ class Lexer
         }
 
         if (token === null) {
-            throw new SyntaxError(`Unexpected symbol ${this.slice[0]} at position ${this.pos.index}`)
+            throw new SyntaxError(`Invalid symbol ${this.slice[0]} at position ${this.pos.index}`)
         }
         this.advance(token.value.length)
 
@@ -144,14 +241,18 @@ class Lexer
         }
 
         if (token === null) {
-            throw new SyntaxError(`Unexpected symbol ${this.slice[0]} at position ${this.pos.index}`)
+            throw new SyntaxError(`Invalid symbol ${this.slice[0]} at position ${this.pos.index}`)
         }
 
         return token;
     }
 }
 
-class Position {
+class Position
+{
+    index = 0
+    code = ""
+
     constructor(index, code)
     {
         this.index = index
@@ -173,7 +274,7 @@ class Position {
 
     toString()
     {
-        return `${this.index}`
+        return this.index.toString()
     }
 }
 

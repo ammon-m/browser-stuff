@@ -1,5 +1,5 @@
 import { CommandParser } from "./lib/CommandParser.js"
-import * as parser from "./lib/CommandParser.js"
+import Logger from "./lib/Logger.js"
 import * as minifs from "./lib/minifs.js"
 
 window.addEventListener("DOMContentLoaded", event => {
@@ -37,19 +37,28 @@ function init(motd)
                 document.activeElement.blur()
                 event.preventDefault()
             }
-            if(event.key == "ArrowUp")
+            if(event.key == "ArrowUp" && commandHistory.length && !event.shiftKey)
             {
                 if(--commandHistoryPos < 0) commandHistoryPos = 0
                 input.value = commandHistory[commandHistoryPos]
                 event.preventDefault()
             }
-            if(event.key == "ArrowDown")
+            if(event.key == "ArrowDown" && commandHistory.length && !event.shiftKey)
             {
                 if(++commandHistoryPos > commandHistory.length) commandHistoryPos = commandHistory.length
                 if(commandHistoryPos == commandHistory.length)
                     input.value = ""
                 else
                     input.value = commandHistory[commandHistoryPos]
+                event.preventDefault()
+            }
+        }
+        else
+        {
+            if(event.key.match(/[\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/) && event.key.length == 1 && !event.ctrlKey && !event.metaKey)
+            {
+                input.focus()
+                input.value += event.key
                 event.preventDefault()
             }
         }
@@ -63,13 +72,11 @@ function receiveUserCommand(value)
 {
     if(!value || value == "") return;
 
-    log.submit(value)
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
+    logger.log("&gt; " + value)
 
     input.value = ""
-
-    renderOutput()
 
     const parser = new CommandParser()
     let command = null
@@ -80,37 +87,41 @@ function receiveUserCommand(value)
     }
     catch(error)
     {
-        console.log(error)
-        log.submit(error)
+        logger.error(error)
         return;
     }
     if(command == null) return;
 
-    // yay command !!!
+    command.execute()
+
+    console.log(command)
 }
 
 /**@type {string[]}*/
 const commandHistory = []
 let commandHistoryPos = 0
 
-/**@type {string[]}*/
-export const log = []
-log.submit = function(...items) {
-    let out = this.push(items.map(value => {
-        if(value.toString)
-            return value.toString()
-        return String(value)
-    }))
-    renderOutput()
-    return out
-}
+export const logger = new Logger((entries) => {
+    renderOutput(entries)
+})
 
-function renderOutput()
+function renderOutput(entries)
 {
     var str = ""
-    for(var i = 0; i < log.length; i++)
+    for(var i = 0; i < entries.length; i++)
     {
-        str += `<span class="line">${log[i]}</span>`
+        const ln = entries[i]
+
+        let type = ""
+        if(ln.type == "Warning") type = " warn"
+        if(ln.type == "Error") type = " error"
+
+        let shift = ""
+        if(ln.message.startsWith("&gt; ")) shift = ` style="margin-left: -2ch;"`
+
+        let txt = ln.message
+
+        str += `<span class="line${type}"${shift}>${txt}</span>`
     }
     output.innerHTML = str
     output.scrollTop = output.scrollHeight

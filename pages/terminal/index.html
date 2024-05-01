@@ -17,50 +17,95 @@
                 background-color: #181818;
                 position: relative;
             }
+
             .container {
                 display: block;
             }
+
             #output {
                 position: absolute;
                 bottom: calc(1em + 4px);
+
+                padding-left: 2ch;
                 width: calc(100% - 2ch);
                 max-height: calc(100% - calc(1em + 4px));
+
                 color: #c0c0c0;
-                padding-left: 2ch;
-                overflow-y: scroll;
-                scrollbar-width: 0;
-                text-wrap: wrap;
+
                 word-wrap: normal;
+                text-wrap: wrap;
                 text-overflow: clip;
+
+                overflow-x: hidden;
+                overflow-y: scroll;
+
+                scrollbar-width: 0;
+                -ms-overflow-style: none;  /* IE and Edge */
             }
+            #output::-webkit-scrollbar {
+                display: none;
+            }
+
             #input-container {
                 position: absolute;
                 bottom: 0;
+
                 width: 100%;
                 height: calc(1em + 4px);
+
                 background-color: #101010;
             }
             #input {
+                padding: 2px 0;
                 width: calc(100% - 2ch);
                 height: 100%;
-                padding: 2px 0;
+
                 border: none;
                 outline: none;
+
                 background: none;
                 color: #c0c0c0;
+
+                transition: color 0.1s cubic-bezier(0.215, 0.610, 0.355, 1);
+
                 font-family: 'Consolas', 'Courier New', Courier, monospace;
                 font-size: 14px;
+
                 text-wrap: nowrap;
+
                 overflow-x: scroll;
+                overflow-y: hidden;
+
                 scrollbar-width: 0;
+                -ms-overflow-style: none;  /* IE and Edge */
+
                 float: left;
             }
             #input:focus {
                 color: white;
             }
-            span.line {
+            #input::-webkit-scrollbar {
+                display: none;
+            }
+
+            .line {
                 display: block;
                 cursor: default;
+            }
+            .line.warn {
+                color: rgb(234, 171, 61);
+            }
+            .line.error {
+                color: rgb(246, 45, 51);
+            }
+
+            ::selection {
+                background-color: #b0b0b0; /* #264f78 */
+                color: #101010;
+            }
+            ::-moz-selection {
+                background-color: #b0b0b0;
+                color: #101010;
             }
         </style>
         <script type="module" src="./src/main.js"></script>
