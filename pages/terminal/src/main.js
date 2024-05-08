@@ -120,11 +120,10 @@ function renderOutput(entries)
         if(ln.message.startsWith("> ")) shift = ` style="margin-left: -2ch;"`
 
         let txt = ln.message
-
         if(ln.message.startsWith("> "))
-            str += `<span class="line${type}"${shift}><pre>${txt}</pre></span>`
-        else
-            str += `<span class="line${type}"${shift}>${txt}</span>`
+            txt = txt.replaceAll("<", "&lt;")
+
+        str += `<span class="line${type}"${shift}>${txt}</span>`
     }
     output.innerHTML = str
     output.scrollTop = output.scrollHeight
