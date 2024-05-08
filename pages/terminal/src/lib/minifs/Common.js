@@ -2,30 +2,50 @@
  * Authors: @ammon-m
  * 
  * Description:
- *  minifs is a small module that provides an in-memory digital file system
+ *  minifs is a module that provides a simple lightweight virtual file system
  * 
  */
 
 export class Uri
 {
     /**
-     * The `/some/path` part of `./some/path.ext`
+     * The `./path/to/file` part of `./path/to/file.ext`
      */
     path = ""
 
     /**
-     * The `path` part of `./some/path.ext`
+     * The `file.ext` part of `./path/to/file.ext`
      */
     fileName = ""
 
     /**
-     * The `ext` part of `./some/path.ext`
+     * The `ext` part of `./path/to/file.ext`
      * @type {string | null}
      */
     fileExtension = ""
 
-    constructor()
+    constructor(path)
     {
-        
+        const e = /([^\/\t]+(\/[^\/\t]+)*)(\.([a-zA-Z0-9]+)|\/)/.exec(path)
+        if(!e)
+            throw new SyntaxError("Invalid path")
+
+        let split = e[0].split("/")
+
+        let ext = e[4] == "" ? null : e[4]
+        this.fileExtension = ext
+
+        this.fileName = e[0].endsWith("/")
+            ? split[split.length - 1]
+            : split[split.length];
+
+        this.path = e[0].endsWith("/")
+            ? e[0]
+            : e[0].replace("." + ext, "");
+    }
+
+    toString()
+    {
+        return this.path + (this.fileExtension ? "." + this.fileExtension : "/")
     }
 }

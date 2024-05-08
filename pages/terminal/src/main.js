@@ -10,6 +10,8 @@ const output = document.getElementById("output")
 /**@type {HTMLInputElement}*/
 const input = document.getElementById("input")
 
+export const fs = new minifs.FileSystem()
+
 /**
  * @param {string} motd
  */
@@ -74,7 +76,7 @@ function receiveUserCommand(value)
 
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
-    logger.log("> " + value.replaceAll("<", "&lt;"))
+    logger.log("> " + value)
 
     input.value = ""
 

@@ -9,6 +9,7 @@ const tokenTypes = Object.freeze({
     dot: /\./,
     number: /\d+(?:\.\d+)?/,
     string: /(?:".*"|'.*')/,
+    path: /[^\/\t]+(\/[^\/\t]+)*(\.[a-zA-Z0-9]+|\/)/,
     literal: /[a-zA-Z_][a-zA-Z_0-9]*/,
     boolean: /true|false/,
     question: /\?/,
@@ -69,6 +70,7 @@ const commandsList =
             logger.error(new SyntaxError("First argument of print cannot be an empty string"))
         else logger.log(
             event.parameters[0].value
+            .replaceAll("<", "&lt;")
             .replaceAll("\\n", "<br>")
             .replaceAll("\\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
             .replaceAll(/<\/?script>/g, "")
