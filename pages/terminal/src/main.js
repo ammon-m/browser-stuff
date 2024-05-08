@@ -74,7 +74,7 @@ function receiveUserCommand(value)
 
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
-    logger.log("&gt; " + value)
+    logger.log("> " + value)
 
     input.value = ""
 
@@ -117,11 +117,14 @@ function renderOutput(entries)
         if(ln.type == "Error") type = " error"
 
         let shift = ""
-        if(ln.message.startsWith("&gt; ")) shift = ` style="margin-left: -2ch;"`
+        if(ln.message.startsWith("> ")) shift = ` style="margin-left: -2ch;"`
 
         let txt = ln.message
 
-        str += `<span class="line${type}"${shift}>${txt}</span>`
+        if(ln.message.startsWith("> "))
+            str += `<span class="line${type}"${shift}><pre>${txt}</pre></span>`
+        else
+            str += `<span class="line${type}"${shift}>${txt}</span>`
     }
     output.innerHTML = str
     output.scrollTop = output.scrollHeight
