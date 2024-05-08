@@ -74,7 +74,7 @@ function receiveUserCommand(value)
 
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
-    logger.log("> " + value)
+    logger.log("> " + value.replaceAll("<", "&lt;"))
 
     input.value = ""
 
@@ -120,8 +120,6 @@ function renderOutput(entries)
         if(ln.message.startsWith("> ")) shift = ` style="margin-left: -2ch;"`
 
         let txt = ln.message
-        if(ln.message.startsWith("> "))
-            txt = txt.replaceAll("<", "&lt;")
 
         str += `<span class="line${type}"${shift}>${txt}</span>`
     }
