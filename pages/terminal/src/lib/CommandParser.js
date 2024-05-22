@@ -98,17 +98,17 @@ export class CommandParser
 {
     commands =
     {
-        help: new Command("help", [
+        help: () => new Command("help", [
             this.HelpCommandArgument(),
             this.End(),
         ], commandsList.help),
 
-        print: new Command("print", [
+        print: () => new Command("print", [
             this.String(),
             this.End(),
         ], commandsList.print),
 
-        clear: new Command("clear", [
+        clear: () => new Command("clear", [
             this.End(),
         ], commandsList.clear),
     }
@@ -125,7 +125,7 @@ export class CommandParser
     {
         let name = this.Literal()
 
-        if(commands.hasOwnProperty(name.value)) return commands[name.value];
+        if(this.commands.hasOwnProperty(name.value)) return this.commands[name.value]();
 
         throw new SyntaxError(`Unknown command '${name.value}'`)
     }
