@@ -61,6 +61,8 @@ const commandsList =
             + "<br><br>Use help &lt;command> to learn more about a specific command")
         else if(!commandsList.hasOwnProperty(cmd.value))
             logger.error(new SyntaxError(`Unknown command '${cmd.value}'`))
+        else if(!commandsHelp.hasOwnProperty(cmd.value))
+            logger.log("[no documentation]")
         else logger.log(commandsHelp[cmd.value])
     },
 
@@ -94,6 +96,23 @@ const commandsHelp =
 
 export class CommandParser
 {
+    commands =
+    {
+        help: new Command("help", [
+            this.HelpCommandArgument(),
+            this.End(),
+        ], commandsList.help),
+
+        print: new Command("print", [
+            this.String(),
+            this.End(),
+        ], commandsList.print),
+
+        clear: new Command("clear", [
+            this.End(),
+        ], commandsList.clear),
+    }
+
     parse(string)
     {
         this.string = string
@@ -106,22 +125,8 @@ export class CommandParser
     {
         let name = this.Literal()
 
-        switch(name.value)
-        {
-            case "help": return new Command("help", [
-                this.HelpCommandArgument(),
-                this.End(),
-            ], commandsList.help);
+        if(commands.hasOwnProperty(name.value)) return commands[name.value];
 
-            case "print": return new Command("print", [
-                this.String(),
-                this.End(),
-            ], commandsList.print);
-
-            case "clear": return new Command("clear", [
-                this.End(),
-            ], commandsList.clear);
-        }
         throw new SyntaxError(`Unknown command '${name.value}'`)
     }
 
