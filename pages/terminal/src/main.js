@@ -94,7 +94,7 @@ function receiveUserCommand(value)
     }
     if(command == null) return;
 
-    command.Execute()
+    command.execute()
 }
 
 /**@type {string[]}*/
