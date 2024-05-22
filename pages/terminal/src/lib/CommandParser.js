@@ -1,5 +1,3 @@
-import { logger } from "../main.js";
-
 const tokenTypes = Object.freeze({
     opCurly: /\{/,
     clCurly: /\}/,
@@ -31,6 +29,8 @@ class Command
 {
     /**@private */
     callback;
+    /**@private */
+    logger;
 
     /**
      * @param {string} name 
@@ -45,16 +45,16 @@ class Command
         this.callback = callback
     }
 
-    execute()
+    execute(logger)
     {
-        this.callback(new CommandExecutionEvent(this.parameters))
+        this.callback(new CommandExecutionEvent(this.parameters), logger)
     }
 }
 
 const commandsList =
 {
     /** @param {CommandExecutionEvent} event */
-    help: (event) => {
+    help: (event, logger) => {
         const cmd = event.parameters[0]
         if(cmd.type == "EoL")
             logger.log("List of all available commands" + "<br>&nbsp;&nbsp;" + (Object.keys(commandsList).join("<br>&nbsp;&nbsp;"))
@@ -67,7 +67,7 @@ const commandsList =
     },
 
     /** @param {CommandExecutionEvent} event */
-    print: (event) => {
+    print: (event, logger) => {
         if(event.parameters[0].value == "")
             logger.error(new SyntaxError("First argument of print cannot be an empty string"))
         else logger.log(
@@ -82,7 +82,7 @@ const commandsList =
     },
 
     /** @param {CommandExecutionEvent} event */
-    clear: (event) => {
+    clear: (event, logger) => {
         logger.clear()
     }
 }
