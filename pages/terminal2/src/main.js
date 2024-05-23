@@ -39,6 +39,8 @@ function init(motd)
 {
     if(motd) console.log(motd)
 
+    drawCanvas()
+
     window.addEventListener("keydown", event => {
         if(event.code == "Enter")
         {
@@ -260,4 +262,3 @@ function drawCanvas()
 
     //#endregion
 }
-drawCanvas()
