@@ -3,6 +3,8 @@ import Logger from "./lib/Logger.js"
 import ThemeColorSet from "./lib/ThemeColorSet.js"
 import * as minifs from "./lib/minifs.js"
 
+'use strict';
+
 function stringReplaceShift(string, index, replacement) {
     if(index < string.length)
         return string.substring(0, index) + replacement + string.substring(index, string.length - replacement.length);
@@ -241,7 +243,7 @@ function drawCanvas()
     textCtx.fillStyle = theme.foreground;
     textCtx.font = font;
 
-    let str = global.user + "@" + global.device + ":" + global.path + "$ "
+    let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
     let x = 5
     let y = 5
 
