@@ -188,11 +188,13 @@ function renderOutput(entries)
         str += `<span class="line${type}"${shift}>${txt}</span>`
     }
     output.value = str
+
+    drawCanvas()
 }
 
 const mainElement = document.getElementById("main");
 
-const font = "14px Consolas, 'Courier New', monospace"
+const font = "14px monospace"
 
 /**@type {HTMLCanvasElement} */
 const textCanvas = document.getElementById("text")
@@ -253,6 +255,7 @@ function drawCanvas()
     //#region cursor
 
     cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height)
+    cursorCtx.font = font;
 
     cursorCtx.fillStyle = global.theme.foreground
     cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
