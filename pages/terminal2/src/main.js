@@ -187,18 +187,17 @@ textCtx.canvas.height = mainElement.clientHeight;
 cursorCtx.canvas.width = mainElement.clientWidth;
 cursorCtx.canvas.height = mainElement.clientHeight;
 
-const maxColumns = Math.floor(textCanvas.width / charWidth)
-const maxRows = Math.floor(textCanvas.height / charWidth)
+textCtx.font = font;
+cursorCtx.font = font;
 
 const charWidth = textCtx.measureText("0").width + textCtx.letterSpacing;
 const lineHeight = 14
 
-textCtx.font = font;
-cursorCtx.font = font;
+const maxColumns = Math.floor(textCtx.canvas.width / charWidth)
+const maxRows = Math.floor(textCtx.canvas.height / lineHeight)
 
 function drawCanvas()
 {
-
     textCtx.fillStyle = theme.background;
     textCtx.fillRect(0, 0, textCtx.canvas.width, textCtx.canvas.height);
 
@@ -227,7 +226,6 @@ function drawCanvas()
 
     textCtx.fillStyle = theme.foreground;
     textCtx.fillText(input, x * charWidth, y * lineHeight);
-
 
 
     cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
