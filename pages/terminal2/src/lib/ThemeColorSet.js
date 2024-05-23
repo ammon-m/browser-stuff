@@ -9,6 +9,6 @@ export default class ThemeColorSet
     }
 
     static get Default() {
-        return new ThemeColorSet()
+        return new ThemeColorSet({})
     }
 }
