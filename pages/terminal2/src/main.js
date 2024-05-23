@@ -240,42 +240,42 @@ function drawCanvas()
     textCtx.fillStyle = theme.background;
     textCtx.fillRect(0, 0, textCanvas.width, textCanvas.height);
 
-    textCtx.fillStyle = theme.foreground;
+    textCtx.fillStyle = "#ffffff";
     textCtx.font = font;
 
-    let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
+    // let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
     let x = 5
     let y = 5
 
-    textCtx.fillStyle = theme.user;
+    textCtx.fillStyle = "#ffffff";
     textCtx.fillText(global.user + "@" + global.device, x * charWidth, y * lineHeight);
     x += (global.user + "@" + global.device).length
 
-    textCtx.fillStyle = theme.foreground;
+    textCtx.fillStyle = "#ffffff";
     textCtx.fillText(":", x * charWidth, y * lineHeight);
     x++
 
-    textCtx.fillStyle = theme.path;
+    textCtx.fillStyle = "#ffffff";
     textCtx.fillText(global.cwd, x * charWidth, y * lineHeight);
     x += global.cwd.length
 
-    textCtx.fillStyle = theme.foreground;
+    textCtx.fillStyle = "#ffffff";
     textCtx.fillText("$ ", x * charWidth, y * lineHeight);
     x += 2
 
-    textCtx.fillStyle = theme.foreground;
+    textCtx.fillStyle = "#ffffff";
     textCtx.fillText(input, x * charWidth, y * lineHeight);
 
 
 
-    cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height)
-    cursorCtx.font = font;
+    // cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height)
+    // cursorCtx.font = font;
 
-    cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
+    // cursorCtx.fillStyle = theme.foreground
+    // cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
 
-    cursorCtx.fillStyle = theme.background
-    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
+    // cursorCtx.fillStyle = theme.background
+    // cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
 }
 
 init("hello world")
