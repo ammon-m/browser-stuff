@@ -235,8 +235,6 @@ function renderOutput(entries)
 
 function drawCanvas()
 {
-    //#region text
-
     textCtx.fillStyle = theme.background;
     textCtx.fillRect(0, 0, textCanvas.width, textCanvas.height);
 
@@ -264,11 +262,9 @@ function drawCanvas()
     x += 2
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(input, x * charWidth, y * lineHeight, (maxColumns - str.length) * charWidth);
+    textCtx.fillText(input, x * charWidth, y * lineHeight);
 
-    //#endregion
 
-    //#region cursor
 
     cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height)
     cursorCtx.font = font;
@@ -278,8 +274,6 @@ function drawCanvas()
 
     cursorCtx.fillStyle = theme.background
     cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
-
-    //#endregion
 }
 
 init("hello world")
