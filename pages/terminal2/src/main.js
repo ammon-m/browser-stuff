@@ -40,13 +40,21 @@ function init(motd)
     if(motd) console.log(motd)
 
     window.addEventListener("keydown", event => {
-        if(event.key == "Enter")
+        if(event.code == "Enter")
         {
             cursorPos = 0
             receiveUserCommand(input)
             event.preventDefault()
         }
-        else if(event.key == "ArrowUp" && commandHistory.length > 0 && !event.shiftKey)
+        else if(event.code == "Backspace")
+        {
+            input = input.slice(0, cursorPos - 1) + input.slice(cursorPos)
+            cursorPos--
+            event.preventDefault()
+
+            drawCanvas()
+        }
+        else if(event.code == "ArrowUp" && commandHistory.length > 0 && !event.shiftKey)
         {
             if(--commandHistoryPos < 0) commandHistoryPos = 0
             input = commandHistory[commandHistoryPos]
@@ -55,7 +63,7 @@ function init(motd)
 
             drawCanvas()
         }
-        else if(event.key == "ArrowDown" && commandHistory.length > 0 && !event.shiftKey)
+        else if(event.code == "ArrowDown" && commandHistory.length > 0 && !event.shiftKey)
         {
             if(++commandHistoryPos > commandHistory.length) commandHistoryPos = commandHistory.length
             if(commandHistoryPos == commandHistory.length)
@@ -67,14 +75,14 @@ function init(motd)
 
             drawCanvas()
         }
-        else if(event.key == "ArrowLeft" && cursorPos > 0 && !event.shiftKey)
+        else if(event.code == "ArrowLeft" && cursorPos > 0 && !event.shiftKey)
         {
             if(event.ctrlKey) cursorPos = 0
             else cursorPos--
 
             drawCanvas()
         }
-        else if(event.key == "ArrowRight" && cursorPos < input.length && !event.shiftKey)
+        else if(event.code == "ArrowRight" && cursorPos < input.length && !event.shiftKey)
         {
             if(event.ctrlKey) cursorPos = input.length
             else cursorPos++
@@ -252,3 +260,4 @@ function drawCanvas()
 
     //#endregion
 }
+drawCanvas()
