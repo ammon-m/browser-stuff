@@ -33,52 +33,12 @@ const theme = ThemeColorSet.Default
 
 export const fs = new minifs.FileSystem()
 
-/**@type {HTMLElement} */
-let mainElement = null
-
-/**@type {HTMLCanvasElement} */
-let textCanvas = null
-/**@type {CanvasRenderingContext2D} */
-let textCtx = null
-
-/**@type {HTMLCanvasElement} */
-let cursorCanvas = null
-/**@type {CanvasRenderingContext2D} */
-let cursorCtx = null
-
-let charWidth = 10
-let lineHeight = 15
-
-let maxColumns = 1
-let maxRows = 1
-
 /**
  * @param {string} motd
  */
 function init(motd)
 {
     if(motd) console.log(motd)
-
-    mainElement = document.getElementById("main")
-
-    textCanvas = document.getElementById("text")
-    textCtx = textCanvas.getContext("2d")
-    textCanvas.width = mainElement.clientWidth;
-    textCanvas.height = mainElement.clientHeight;
-
-    cursorCanvas = document.getElementById("selection")
-    cursorCtx = cursorCanvas.getContext("2d")
-    cursorCanvas.width = mainElement.clientWidth;
-    cursorCanvas.height = mainElement.clientHeight;
-
-    textCtx.font = font;
-    cursorCtx.font = font;
-
-    charWidth = textCtx.measureText("0").width + textCtx.letterSpacing;
-    lineHeight = 15
-
-    maxColumns = Math.floor(textCanvas.width / charWidth)
-    maxRows = Math.floor(textCanvas.height / charWidth)
 
     window.addEventListener("keydown", event => {
         if(event.code == "Enter")
@@ -215,10 +175,32 @@ function renderOutput(entries)
     output.value = str
 }
 
+/**@type {CanvasRenderingContext2D} */
+const textCtx = document.getElementById("text").getContext("2d")
+/**@type {CanvasRenderingContext2D} */
+const cursorCtx = document.getElementById("selection").getContext("2d")
+
+const mainElement = document.getElementById("main")
+
+textCtx.canvas.width = mainElement.clientWidth;
+textCtx.canvas.height = mainElement.clientHeight;
+cursorCtx.canvas.width = mainElement.clientWidth;
+cursorCtx.canvas.height = mainElement.clientHeight;
+
+const maxColumns = Math.floor(textCanvas.width / charWidth)
+const maxRows = Math.floor(textCanvas.height / charWidth)
+
+const charWidth = textCtx.measureText("0").width + textCtx.letterSpacing;
+const lineHeight = 14
+
+textCtx.font = font;
+cursorCtx.font = font;
+
 function drawCanvas()
 {
+
     textCtx.fillStyle = theme.background;
-    textCtx.fillRect(0, 0, textCanvas.width, textCanvas.height);
+    textCtx.fillRect(0, 0, textCtx.canvas.width, textCtx.canvas.height);
 
     textCtx.fillStyle = theme.foreground;
     textCtx.font = font;
@@ -248,7 +230,7 @@ function drawCanvas()
 
 
 
-    cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height)
+    cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
     cursorCtx.font = font;
 
     cursorCtx.fillStyle = theme.foreground
