@@ -230,8 +230,8 @@ function drawCanvas()
     textCtx.font = font;
 
     let str = global.user + "@" + global.device + ":" + global.path + "$ "
-    let x = 0
-    let y = 0
+    let x = 5
+    let y = 5
 
     textCtx.fillStyle = global.theme.user;
     textCtx.fillText(global.user + "@" + global.device, x * charWidth, y * lineHeight);
