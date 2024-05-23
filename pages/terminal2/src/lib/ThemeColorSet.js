@@ -9,6 +9,8 @@ export default class ThemeColorSet
     }
 
     static get Default() {
-        return new ThemeColorSet({})
+        return new ThemeColorSet({
+            user: "#15d43e", path: "#7b85ed", background: "#000000", foreground: "#c0c0c0"
+        })
     }
 }
