@@ -3,8 +3,6 @@ import Logger from "./lib/Logger.js"
 import ThemeColorSet from "./lib/ThemeColorSet.js"
 import * as minifs from "./lib/minifs.js"
 
-if(motd) console.log(motd)
-
 function stringReplaceShift(string, index, replacement) {
     if(index < string.length)
         return string.substring(0, index) + replacement + string.substring(index, string.length - replacement.length);
@@ -32,110 +30,136 @@ globalThis.global = {
 
 export const fs = new minifs.FileSystem()
 
-const mainElement = document.getElementById("main")
+/**@type {HTMLCanvasElement} */
+let mainElement = null
 
 /**@type {HTMLCanvasElement} */
-const textCanvas = document.getElementById("text")
-const textCtx = textCanvas.getContext("2d")
-textCanvas.width = mainElement.clientWidth;
-textCanvas.height = mainElement.clientHeight;
-textCtx.font = font;
+let textCanvas = null
+let textCtx = null
 
 /**@type {HTMLCanvasElement} */
-const cursorCanvas = document.getElementById("selection")
-const cursorCtx = cursorCanvas.getContext("2d")
-cursorCanvas.width = mainElement.clientWidth;
-cursorCanvas.height = mainElement.clientHeight;
-cursorCtx.font = font;
+let cursorCanvas = null
+let cursorCtx = null
 
-const charWidth = textCtx.measureText("0").width + textCtx.letterSpacing;
-const lineHeight = 15
+let charWidth = 10
+let lineHeight = 15
 
-const maxColumns = Math.floor(textCanvas.width / charWidth)
-const maxRows = Math.floor(textCanvas.height / charWidth)
+let maxColumns = 1
+let maxRows = 1
 
-window.addEventListener("keydown", event => {
-    if(event.code == "Enter")
-    {
-        cursorPos = 0
-        receiveUserCommand(input)
-        event.preventDefault()
-    }
-    else if(event.code == "Backspace")
-    {
-        input = input.slice(0, cursorPos - 1) + input.slice(cursorPos)
-        cursorPos--
-        event.preventDefault()
+/**
+ * @param {string} motd
+ */
+function init(motd)
+{
+    if(motd) console.log(motd)
 
-        drawCanvas()
-    }
-    else if(event.code == "ArrowUp" && commandHistory.length > 0 && !event.shiftKey)
-    {
-        if(--commandHistoryPos < 0) commandHistoryPos = 0
-        input = commandHistory[commandHistoryPos]
-        cursorPos = input.length
-        event.preventDefault()
+    mainElement = document.getElementById("main")
 
-        drawCanvas()
-    }
-    else if(event.code == "ArrowDown" && commandHistory.length > 0 && !event.shiftKey)
-    {
-        if(++commandHistoryPos > commandHistory.length) commandHistoryPos = commandHistory.length
-        if(commandHistoryPos == commandHistory.length)
-            input = ""
-        else
-            input = commandHistory[commandHistoryPos]
-        cursorPos = input.length
-        event.preventDefault()
+    textCanvas = document.getElementById("text")
+    textCtx = textCanvas.getContext("2d")
+    textCanvas.width = mainElement.clientWidth;
+    textCanvas.height = mainElement.clientHeight;
 
-        drawCanvas()
-    }
-    else if(event.code == "ArrowLeft" && cursorPos > 0 && !event.shiftKey)
-    {
-        if(event.ctrlKey) cursorPos = 0
-        else cursorPos--
+    cursorCanvas = document.getElementById("selection")
+    cursorCtx = cursorCanvas.getContext("2d")
+    cursorCanvas.width = mainElement.clientWidth;
+    cursorCanvas.height = mainElement.clientHeight;
 
-        drawCanvas()
-    }
-    else if(event.code == "ArrowRight" && cursorPos < input.length && !event.shiftKey)
-    {
-        if(event.ctrlKey) cursorPos = input.length
-        else cursorPos++
+    textCtx.font = font;
+    cursorCtx.font = font;
 
-        drawCanvas()
-    }
-    else if(event.key.match(/[\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/) && event.key.length == 1 && !event.ctrlKey && !event.metaKey)
-    {
-        input = stringReplaceShift(input, cursorPos, event.key)
-        cursorPos++;
-        commandHistoryPos = commandHistory.length
-        event.preventDefault()
+    charWidth = textCtx.measureText("0").width + textCtx.letterSpacing;
+    lineHeight = 15
 
-        drawCanvas()
-    }
-    else if(event.code == "KeyV" && event.ctrlKey && event.shiftKey)
-    {
-        pastingAll = true;
-    }
-})
-
-window.addEventListener("paste", event => {
-    let str = event.clipboardData.getData("text/plain");
-
-    if(!pastingAll)
-    {
-        str = str.replaceAll(/[^\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/g, "")
-    }
-
-    input = stringReplaceShift(input, cursorPos, str)
-    cursorPos += str.length
-    commandHistoryPos = commandHistory.length
-
-    pastingAll = false;
-    event.preventDefault();
+    maxColumns = Math.floor(textCanvas.width / charWidth)
+    maxRows = Math.floor(textCanvas.height / charWidth)
 
     drawCanvas()
-}, false)
+
+    window.addEventListener("keydown", event => {
+        if(event.code == "Enter")
+        {
+            cursorPos = 0
+            receiveUserCommand(input)
+            event.preventDefault()
+        }
+        else if(event.code == "Backspace")
+        {
+            input = input.slice(0, cursorPos - 1) + input.slice(cursorPos)
+            cursorPos--
+            event.preventDefault()
+
+            drawCanvas()
+        }
+        else if(event.code == "ArrowUp" && commandHistory.length > 0 && !event.shiftKey)
+        {
+            if(--commandHistoryPos < 0) commandHistoryPos = 0
+            input = commandHistory[commandHistoryPos]
+            cursorPos = input.length
+            event.preventDefault()
+
+            drawCanvas()
+        }
+        else if(event.code == "ArrowDown" && commandHistory.length > 0 && !event.shiftKey)
+        {
+            if(++commandHistoryPos > commandHistory.length) commandHistoryPos = commandHistory.length
+            if(commandHistoryPos == commandHistory.length)
+                input = ""
+            else
+                input = commandHistory[commandHistoryPos]
+            cursorPos = input.length
+            event.preventDefault()
+
+            drawCanvas()
+        }
+        else if(event.code == "ArrowLeft" && cursorPos > 0 && !event.shiftKey)
+        {
+            if(event.ctrlKey) cursorPos = 0
+            else cursorPos--
+
+            drawCanvas()
+        }
+        else if(event.code == "ArrowRight" && cursorPos < input.length && !event.shiftKey)
+        {
+            if(event.ctrlKey) cursorPos = input.length
+            else cursorPos++
+
+            drawCanvas()
+        }
+        else if(event.key.match(/[\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/) && event.key.length == 1 && !event.ctrlKey && !event.metaKey)
+        {
+            input = stringReplaceShift(input, cursorPos, event.key)
+            cursorPos++;
+            commandHistoryPos = commandHistory.length
+            event.preventDefault()
+
+            drawCanvas()
+        }
+        else if(event.code == "KeyV" && event.ctrlKey && event.shiftKey)
+        {
+            pastingAll = true;
+        }
+    })
+
+    window.addEventListener("paste", event => {
+        let str = event.clipboardData.getData("text/plain");
+
+        if(!pastingAll)
+        {
+            str = str.replaceAll(/[^\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/g, "")
+        }
+
+        input = stringReplaceShift(input, cursorPos, str)
+        cursorPos += str.length
+        commandHistoryPos = commandHistory.length
+
+        pastingAll = false;
+        event.preventDefault();
+
+        drawCanvas()
+    }, false)
+}
 
 /**
  * @param {string} value
@@ -254,4 +278,5 @@ function drawCanvas()
 
     //#endregion
 }
-drawCanvas()
+
+init("hello world")
