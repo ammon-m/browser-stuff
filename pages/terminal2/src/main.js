@@ -184,18 +184,18 @@ function renderOutput(entries)
 
 /**@type {CanvasRenderingContext2D} */
 const textCtx = document.getElementById("text").getContext("2d")
-/**@type {CanvasRenderingContext2D} */
-const cursorCtx = document.getElementById("selection").getContext("2d")
+// /**@type {CanvasRenderingContext2D} */
+// const cursorCtx = document.getElementById("selection").getContext("2d")
 
 const mainElement = document.getElementById("main")
 
 textCtx.canvas.width = mainElement.clientWidth;
 textCtx.canvas.height = mainElement.clientHeight;
-cursorCtx.canvas.width = mainElement.clientWidth;
-cursorCtx.canvas.height = mainElement.clientHeight;
+// cursorCtx.canvas.width = mainElement.clientWidth;
+// cursorCtx.canvas.height = mainElement.clientHeight;
 
 textCtx.font = font;
-cursorCtx.font = font;
+// cursorCtx.font = font;
 
 const charWidth = textCtx.measureText("0").width + textCtx.letterSpacing;
 const lineHeight = 14
@@ -235,14 +235,14 @@ function drawCanvas()
     textCtx.fillText(input, x * charWidth, y * lineHeight);
 
 
-    cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
-    cursorCtx.font = font;
+    // cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
+    // cursorCtx.font = font;
 
-    cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
+    // cursorCtx.fillStyle = theme.foreground
+    // cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
 
-    cursorCtx.fillStyle = theme.background
-    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
+    // cursorCtx.fillStyle = theme.background
+    // cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
 }
 
 init("hello world")
