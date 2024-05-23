@@ -136,6 +136,8 @@ function receiveUserCommand(value)
     commandHistoryPos = commandHistory.length
     logger.log("> " + value)
 
+    console.log(value)
+
     input = ""
 
     const parser = new CommandParser()
