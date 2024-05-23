@@ -24,21 +24,24 @@ let pastingAll = false;
 globalThis.global = {
     user: "user",
     device: "terminal2",
-    cwd: "~",
-    theme: ThemeColorSet.Default
+    cwd: "~"
 }
+
+const theme = ThemeColorSet.Default
 
 export const fs = new minifs.FileSystem()
 
-/**@type {HTMLCanvasElement} */
+/**@type {HTMLElement} */
 let mainElement = null
 
 /**@type {HTMLCanvasElement} */
 let textCanvas = null
+/**@type {CanvasRenderingContext2D} */
 let textCtx = null
 
 /**@type {HTMLCanvasElement} */
 let cursorCanvas = null
+/**@type {CanvasRenderingContext2D} */
 let cursorCtx = null
 
 let charWidth = 10
@@ -234,33 +237,33 @@ function drawCanvas()
 {
     //#region text
 
-    textCtx.fillStyle = global.theme.background;
+    textCtx.fillStyle = theme.background;
     textCtx.fillRect(0, 0, textCanvas.width, textCanvas.height);
 
-    textCtx.fillStyle = global.theme.foreground;
+    textCtx.fillStyle = theme.foreground;
     textCtx.font = font;
 
     let str = global.user + "@" + global.device + ":" + global.path + "$ "
     let x = 5
     let y = 5
 
-    textCtx.fillStyle = global.theme.user;
+    textCtx.fillStyle = theme.user;
     textCtx.fillText(global.user + "@" + global.device, x * charWidth, y * lineHeight);
     x += (global.user + "@" + global.device).length
 
-    textCtx.fillStyle = global.theme.foreground;
+    textCtx.fillStyle = theme.foreground;
     textCtx.fillText(":", x * charWidth, y * lineHeight);
     x++
 
-    textCtx.fillStyle = global.theme.path;
+    textCtx.fillStyle = theme.path;
     textCtx.fillText(global.cwd, x * charWidth, y * lineHeight);
     x += global.cwd.length
 
-    textCtx.fillStyle = global.theme.foreground;
+    textCtx.fillStyle = theme.foreground;
     textCtx.fillText("$ ", x * charWidth, y * lineHeight);
     x += 2
 
-    textCtx.fillStyle = global.theme.foreground;
+    textCtx.fillStyle = theme.foreground;
     textCtx.fillText(input, x * charWidth, y * lineHeight, (maxColumns - str.length) * charWidth);
 
     //#endregion
@@ -270,10 +273,10 @@ function drawCanvas()
     cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height)
     cursorCtx.font = font;
 
-    cursorCtx.fillStyle = global.theme.foreground
+    cursorCtx.fillStyle = theme.foreground
     cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
 
-    cursorCtx.fillStyle = global.theme.background
+    cursorCtx.fillStyle = theme.background
     cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
 
     //#endregion
