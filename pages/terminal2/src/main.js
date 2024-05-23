@@ -5,11 +5,18 @@ import * as minifs from "./lib/minifs.js"
 
 'use strict';
 
+/**
+ * @param {string} string
+ * @param {number} index
+ * @param {string} replacement
+ */
 function stringReplaceShift(string, index, replacement) {
-    if(index < string.length)
-        return string.substring(0, index) + replacement + string.substring(index, string.length - replacement.length);
+    if(index <= 0)
+        return replacement + string;
+    else if(index < string.length)
+        return string.substring(0, index) + replacement + string.substring(index, string.length);
     else
-        return string + replacement
+        return string + replacement;
 }
 
 const font = "14px monospace"
