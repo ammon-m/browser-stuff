@@ -248,3 +248,6 @@ function drawCanvas()
 init("hello world")
 
 setInterval(drawCanvas, 1000 / 60)
+
+// goguardian stinking up the shit
+window.removeEventListener("haldlgldplgnggkjaafhelgiaglafanh0.8198154280017336")
