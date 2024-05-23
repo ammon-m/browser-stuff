@@ -14,6 +14,8 @@ function stringReplaceShift(string, index, replacement) {
         return string + replacement
 }
 
+const font = "14px monospace"
+
 const output = {
     value: ""
 }
@@ -32,12 +34,50 @@ globalThis.global = {
 
 export const fs = new minifs.FileSystem()
 
+/**@type {HTMLCanvasElement} */
+let mainElement = null
+
+/**@type {HTMLCanvasElement} */
+let textCanvas = null
+let textCtx = null
+
+/**@type {HTMLCanvasElement} */
+let cursorCanvas = null
+let cursorCtx = null
+
+let charWidth = 10
+let lineHeight = 15
+
+let maxColumns = 1
+let maxRows = 1
+
 /**
  * @param {string} motd
  */
 function init(motd)
 {
     if(motd) console.log(motd)
+
+    mainElement = document.getElementById("main")
+
+    textCanvas = document.getElementById("text")
+    textCtx = textCanvas.getContext("2d")
+    textCanvas.width = mainElement.clientWidth;
+    textCanvas.height = mainElement.clientHeight;
+
+    cursorCanvas = document.getElementById("selection")
+    cursorCtx = cursorCanvas.getContext("2d")
+    cursorCanvas.width = mainElement.clientWidth;
+    cursorCanvas.height = mainElement.clientHeight;
+
+    textCtx.font = font;
+    cursorCtx.font = font;
+
+    charWidth = textCtx.measureText("0").width + textCtx.letterSpacing;
+    lineHeight = 15
+
+    maxColumns = Math.floor(textCanvas.width / charWidth)
+    maxRows = Math.floor(textCanvas.height / charWidth)
 
     drawCanvas()
 
@@ -193,31 +233,6 @@ function renderOutput(entries)
 
     drawCanvas()
 }
-
-const mainElement = document.getElementById("main");
-
-const font = "14px monospace"
-
-/**@type {HTMLCanvasElement} */
-const textCanvas = document.getElementById("text")
-const textCtx = textCanvas.getContext("2d")
-textCtx.canvas.width = mainElement.clientWidth;
-textCtx.canvas.height = mainElement.clientHeight;
-
-/**@type {HTMLCanvasElement} */
-const cursorCanvas = document.getElementById("selection")
-const cursorCtx = cursorCanvas.getContext("2d")
-cursorCtx.canvas.width = mainElement.clientWidth;
-cursorCtx.canvas.height = mainElement.clientHeight;
-
-textCtx.font = font;
-cursorCtx.font = font;
-
-const charWidth = textCtx.measureText("0").width + textCtx.letterSpacing;
-const lineHeight = 15
-
-const maxColumns = Math.floor(textCanvas.width / charWidth)
-const maxRows = Math.floor(textCanvas.height / charWidth)
 
 function drawCanvas()
 {
