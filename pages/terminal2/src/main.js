@@ -80,8 +80,6 @@ function init(motd)
     maxColumns = Math.floor(textCanvas.width / charWidth)
     maxRows = Math.floor(textCanvas.height / charWidth)
 
-    drawCanvas()
-
     window.addEventListener("keydown", event => {
         if(event.code == "Enter")
         {
@@ -94,8 +92,6 @@ function init(motd)
             input = input.slice(0, cursorPos - 1) + input.slice(cursorPos)
             cursorPos--
             event.preventDefault()
-
-            drawCanvas()
         }
         else if(event.code == "ArrowUp" && commandHistory.length > 0 && !event.shiftKey)
         {
@@ -103,8 +99,6 @@ function init(motd)
             input = commandHistory[commandHistoryPos]
             cursorPos = input.length
             event.preventDefault()
-
-            drawCanvas()
         }
         else if(event.code == "ArrowDown" && commandHistory.length > 0 && !event.shiftKey)
         {
@@ -115,22 +109,16 @@ function init(motd)
                 input = commandHistory[commandHistoryPos]
             cursorPos = input.length
             event.preventDefault()
-
-            drawCanvas()
         }
         else if(event.code == "ArrowLeft" && cursorPos > 0 && !event.shiftKey)
         {
             if(event.ctrlKey) cursorPos = 0
             else cursorPos--
-
-            drawCanvas()
         }
         else if(event.code == "ArrowRight" && cursorPos < input.length && !event.shiftKey)
         {
             if(event.ctrlKey) cursorPos = input.length
             else cursorPos++
-
-            drawCanvas()
         }
         else if(event.key.match(/[\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/) && event.key.length == 1 && !event.ctrlKey && !event.metaKey)
         {
@@ -138,8 +126,6 @@ function init(motd)
             cursorPos++;
             commandHistoryPos = commandHistory.length
             event.preventDefault()
-
-            drawCanvas()
         }
         else if(event.code == "KeyV" && event.ctrlKey && event.shiftKey)
         {
@@ -161,8 +147,6 @@ function init(motd)
 
         pastingAll = false;
         event.preventDefault();
-
-        drawCanvas()
     }, false)
 }
 
@@ -196,8 +180,6 @@ function receiveUserCommand(value)
     if(command == null) return;
 
     command.execute()
-
-    drawCanvas()
 }
 
 /**@type {string[]}*/
@@ -231,8 +213,6 @@ function renderOutput(entries)
         str += `<span class="line${type}"${shift}>${txt}</span>`
     }
     output.value = str
-
-    drawCanvas()
 }
 
 function drawCanvas()
@@ -240,42 +220,44 @@ function drawCanvas()
     textCtx.fillStyle = theme.background;
     textCtx.fillRect(0, 0, textCanvas.width, textCanvas.height);
 
-    textCtx.fillStyle = "#ffffff";
+    textCtx.fillStyle = theme.foreground;
     textCtx.font = font;
 
-    // let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
+    let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
     let x = 5
     let y = 5
 
-    textCtx.fillStyle = "#ffffff";
+    textCtx.fillStyle = theme.user;
     textCtx.fillText(global.user + "@" + global.device, x * charWidth, y * lineHeight);
     x += (global.user + "@" + global.device).length
 
-    textCtx.fillStyle = "#ffffff";
+    textCtx.fillStyle = theme.foreground;
     textCtx.fillText(":", x * charWidth, y * lineHeight);
     x++
 
-    textCtx.fillStyle = "#ffffff";
+    textCtx.fillStyle = theme.path;
     textCtx.fillText(global.cwd, x * charWidth, y * lineHeight);
     x += global.cwd.length
 
-    textCtx.fillStyle = "#ffffff";
+    textCtx.fillStyle = theme.foreground;
     textCtx.fillText("$ ", x * charWidth, y * lineHeight);
     x += 2
 
-    textCtx.fillStyle = "#ffffff";
+    textCtx.fillStyle = theme.foreground;
     textCtx.fillText(input, x * charWidth, y * lineHeight);
 
 
 
-    // cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height)
-    // cursorCtx.font = font;
+    cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height)
+    cursorCtx.font = font;
 
-    // cursorCtx.fillStyle = theme.foreground
-    // cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
+    cursorCtx.fillStyle = theme.foreground
+    cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
 
-    // cursorCtx.fillStyle = theme.background
-    // cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
+    cursorCtx.fillStyle = theme.background
+    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
 }
 
 init("hello world")
+
+setInterval(drawCanvas, 1000 / 60)
