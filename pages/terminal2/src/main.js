@@ -203,7 +203,7 @@ const lineHeight = 16
 const maxColumns = Math.floor(textCtx.canvas.width / charWidth)
 const maxRows = Math.floor(textCtx.canvas.height / lineHeight)
 
-const padding = 2;
+const xPadding = 2;
 
 function drawCanvas()
 {
@@ -215,36 +215,36 @@ function drawCanvas()
 
     let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
     let x = 0
-    let y = 1
+    let y = 1 - 3/lineHeight
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(global.user + "@" + global.device, x * charWidth + padding, y * lineHeight);
+    textCtx.fillText(global.user + "@" + global.device, x * charWidth + xPadding, y * lineHeight);
     x += (global.user + "@" + global.device).length
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(":", x * charWidth + padding, y * lineHeight);
+    textCtx.fillText(":", x * charWidth + xPadding, y * lineHeight);
     x++
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(global.cwd, x * charWidth + padding, y * lineHeight);
+    textCtx.fillText(global.cwd, x * charWidth + xPadding, y * lineHeight);
     x += global.cwd.length
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText("$ ", x * charWidth + padding, y * lineHeight);
+    textCtx.fillText("$ ", x * charWidth + xPadding, y * lineHeight);
     x += 2
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(input, x * charWidth + padding, y * lineHeight);
+    textCtx.fillText(input, x * charWidth + xPadding, y * lineHeight);
 
 
     cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
     cursorCtx.font = font;
 
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(str.length * charWidth + cursorPos * charWidth + padding, (y - 1) * lineHeight + 3, charWidth, lineHeight)
+    cursorCtx.fillRect(str.length * charWidth + cursorPos * charWidth + xPadding, (y - 1) * lineHeight + 3, charWidth, lineHeight)
 
     cursorCtx.fillStyle = theme.background
-    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", str.length * charWidth + cursorPos * charWidth + padding, y * lineHeight)
+    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", str.length * charWidth + cursorPos * charWidth + xPadding, y * lineHeight)
 }
 
 init("hello world")
