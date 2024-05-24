@@ -189,10 +189,10 @@ const cursorCtx = document.getElementById("selection").getContext("2d")
 
 const mainElement = document.getElementById("main")
 
-textCtx.canvas.width = Math.floor(mainElement.clientWidth);
-textCtx.canvas.height = Math.floor(mainElement.clientHeight);
-cursorCtx.canvas.width = Math.floor(mainElement.clientWidth);
-cursorCtx.canvas.height = Math.floor(mainElement.clientHeight);
+textCtx.canvas.width = Math.floor(mainElement.clientWidth / 2) * 2;
+textCtx.canvas.height = Math.floor(mainElement.clientHeight / 2) * 2;
+cursorCtx.canvas.width = Math.floor(mainElement.clientWidth / 2) * 2;
+cursorCtx.canvas.height = Math.floor(mainElement.clientHeight / 2) * 2;
 
 textCtx.font = font;
 cursorCtx.font = font;
