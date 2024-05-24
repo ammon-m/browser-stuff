@@ -197,7 +197,7 @@ textCtx.canvas.height = mainElement.clientHeight;
 textCtx.font = font;
 // cursorCtx.font = font;
 
-const charWidth = textCtx.measureText("0").width + textCtx.letterSpacing;
+const charWidth = textCtx.measureText("0").width + Number(textCtx.letterSpacing.replace("px", ""));
 const lineHeight = 14
 
 const maxColumns = Math.floor(textCtx.canvas.width / charWidth)
@@ -211,7 +211,7 @@ function drawCanvas()
     textCtx.fillStyle = theme.foreground;
     textCtx.font = font;
 
-    let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
+    // let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
     let x = 1
     let y = 1
 
