@@ -184,8 +184,8 @@ function renderOutput(entries)
 
 /**@type {CanvasRenderingContext2D} */
 const textCtx = document.getElementById("text").getContext("2d")
-// /**@type {CanvasRenderingContext2D} */
-// const cursorCtx = document.getElementById("selection").getContext("2d")
+/**@type {CanvasRenderingContext2D} */
+const cursorCtx = document.getElementById("selection").getContext("2d")
 
 const mainElement = document.getElementById("main")
 
