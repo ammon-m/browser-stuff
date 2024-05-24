@@ -189,13 +189,13 @@ const textCtx = document.getElementById("text").getContext("2d")
 
 const mainElement = document.getElementById("main")
 
-textCtx.canvas.width = mainElement.clientWidth;
-textCtx.canvas.height = mainElement.clientHeight;
-// cursorCtx.canvas.width = mainElement.clientWidth;
-// cursorCtx.canvas.height = mainElement.clientHeight;
+textCtx.canvas.width = Math.floor(mainElement.clientWidth);
+textCtx.canvas.height = Math.floor(mainElement.clientHeight);
+cursorCtx.canvas.width = Math.floor(mainElement.clientWidth);
+cursorCtx.canvas.height = Math.floor(mainElement.clientHeight);
 
 textCtx.font = font;
-// cursorCtx.font = font;
+cursorCtx.font = font;
 
 const charWidth = textCtx.measureText("0").width + Number(textCtx.letterSpacing.replace("px", ""));
 const lineHeight = 14
@@ -211,7 +211,7 @@ function drawCanvas()
     textCtx.fillStyle = theme.foreground;
     textCtx.font = font;
 
-    // let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
+    let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
     let x = 1
     let y = 1
 
@@ -235,19 +235,16 @@ function drawCanvas()
     textCtx.fillText(input, x * charWidth, y * lineHeight);
 
 
-    // cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
-    // cursorCtx.font = font;
+    cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
+    cursorCtx.font = font;
 
-    // cursorCtx.fillStyle = theme.foreground
-    // cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
+    cursorCtx.fillStyle = theme.foreground
+    cursorCtx.fillRect(cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
 
-    // cursorCtx.fillStyle = theme.background
-    // cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
+    cursorCtx.fillStyle = theme.background
+    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", cursorPos * charWidth, y * lineHeight)
 }
 
 init("hello world")
 
 setInterval(drawCanvas, 1000 / 60)
-
-// goguardian stinking up the shit
-// window.removeEventListener("haldlgldplgnggkjaafhelgiaglafanh0.8198154280017336")
