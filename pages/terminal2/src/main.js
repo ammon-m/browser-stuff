@@ -33,10 +33,12 @@ let pastingAll = false;
 globalThis.global = {
     user: "user",
     device: "terminal2",
-    cwd: "~"
+    cwd: "~",
+    canType: true,
+    theme: ThemeColorSet.Default,
 }
 
-const theme = ThemeColorSet.Default
+const theme = global.theme;
 
 export const fs = new minifs.FileSystem()
 
@@ -48,6 +50,8 @@ function init(motd)
     if(motd) console.log(motd)
 
     window.addEventListener("keydown", event => {
+        if(!global.canType) return;
+
         if(event.code == "Enter")
         {
             cursorPos = 0
