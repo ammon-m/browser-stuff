@@ -198,10 +198,12 @@ textCtx.font = font;
 cursorCtx.font = font;
 
 const charWidth = textCtx.measureText("0").width + Number(textCtx.letterSpacing.replace("px", ""));
-const lineHeight = 14
+const lineHeight = 16
 
 const maxColumns = Math.floor(textCtx.canvas.width / charWidth)
 const maxRows = Math.floor(textCtx.canvas.height / lineHeight)
+
+const padding = 2;
 
 function drawCanvas()
 {
@@ -212,37 +214,37 @@ function drawCanvas()
     textCtx.font = font;
 
     let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
-    let x = 1
+    let x = 0
     let y = 1
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(global.user + "@" + global.device, x * charWidth, y * lineHeight);
+    textCtx.fillText(global.user + "@" + global.device, x * charWidth + padding, y * lineHeight + padding);
     x += (global.user + "@" + global.device).length
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(":", x * charWidth, y * lineHeight);
+    textCtx.fillText(":", x * charWidth + padding, y * lineHeight + padding);
     x++
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(global.cwd, x * charWidth, y * lineHeight);
+    textCtx.fillText(global.cwd, x * charWidth + padding, y * lineHeight + padding);
     x += global.cwd.length
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText("$ ", x * charWidth, y * lineHeight);
+    textCtx.fillText("$ ", x * charWidth + padding, y * lineHeight + padding);
     x += 2
 
     textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(input, x * charWidth, y * lineHeight);
+    textCtx.fillText(input, x * charWidth + padding, y * lineHeight + padding);
 
 
     cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
     cursorCtx.font = font;
 
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(str.length * charWidth + (cursorPos + 1) * charWidth, (y - 1) * lineHeight, charWidth, lineHeight)
+    cursorCtx.fillRect(str.length * charWidth + (cursorPos + 1) * charWidth + padding, (y - 1) * lineHeight + padding, charWidth, lineHeight)
 
     cursorCtx.fillStyle = theme.background
-    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", str.length * charWidth + (cursorPos + 1) * charWidth, y * lineHeight)
+    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", str.length * charWidth + (cursorPos + 1) * charWidth + padding, y * lineHeight + padding)
 }
 
 init("hello world")
