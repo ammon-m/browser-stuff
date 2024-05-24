@@ -54,7 +54,7 @@ function init(motd)
             receiveUserCommand(input)
             event.preventDefault()
         }
-        else if(event.code == "Backspace")
+        else if(event.code == "Backspace" && cursorPos >= 1)
         {
             input = input.slice(0, cursorPos - 1) + input.slice(cursorPos)
             cursorPos--
@@ -77,15 +77,15 @@ function init(motd)
             cursorPos = input.length
             event.preventDefault()
         }
-        else if(event.code == "ArrowLeft" && cursorPos > 0 && !event.shiftKey)
+        else if(event.code == "ArrowLeft" && !event.shiftKey)
         {
             if(event.ctrlKey) cursorPos = 0
-            else cursorPos--
+            else if(cursorPos >= 1) cursorPos--
         }
-        else if(event.code == "ArrowRight" && cursorPos < input.length && !event.shiftKey)
+        else if(event.code == "ArrowRight" && !event.shiftKey)
         {
             if(event.ctrlKey) cursorPos = input.length
-            else cursorPos++
+            else if(cursorPos <= input.length - 1) cursorPos++
         }
         else if(event.key.match(/[\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/) && event.key.length == 1 && !event.ctrlKey && !event.metaKey)
         {
@@ -239,10 +239,10 @@ function drawCanvas()
     cursorCtx.font = font;
 
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(str.length * charWidth + cursorPos * charWidth, y * lineHeight, charWidth, lineHeight)
+    cursorCtx.fillRect(str.length * charWidth + (cursorPos + 1) * charWidth, (y - 1) * lineHeight, charWidth, lineHeight)
 
     cursorCtx.fillStyle = theme.background
-    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", str.length * charWidth + cursorPos * charWidth, y * lineHeight)
+    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", str.length * charWidth + (cursorPos + 1) * charWidth, y * lineHeight)
 }
 
 init("hello world")
