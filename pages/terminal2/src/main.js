@@ -217,7 +217,7 @@ function drawCanvas()
     let x = 0
     let y = 1 - 3/lineHeight
 
-    textCtx.fillStyle = theme.foreground;
+    textCtx.fillStyle = theme.user;
     textCtx.fillText(global.user + "@" + global.device, x * charWidth + xPadding, y * lineHeight);
     x += (global.user + "@" + global.device).length
 
@@ -225,7 +225,7 @@ function drawCanvas()
     textCtx.fillText(":", x * charWidth + xPadding, y * lineHeight);
     x++
 
-    textCtx.fillStyle = theme.foreground;
+    textCtx.fillStyle = theme.path;
     textCtx.fillText(global.cwd, x * charWidth + xPadding, y * lineHeight);
     x += global.cwd.length
 
