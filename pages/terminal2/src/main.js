@@ -219,7 +219,7 @@ function drawCanvas()
 
     const end = terminal.GetEndPosition()
     let x = 0
-    let y = end.y + 1
+    let y = end.y
 
     let len = (global.user + "@" + global.device + ":" + global.cwd + "$ ").length
 
@@ -243,10 +243,10 @@ function drawCanvas()
     cursorCtx.fillText(input, x * charWidth + xPadding, y * lineHeight);
 
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect((len + cursorPos) * charWidth + xPadding, end.y * lineHeight + 3, charWidth, lineHeight)
+    cursorCtx.fillRect((len + cursorPos) * charWidth + xPadding, (y - 1) * lineHeight + 3, charWidth, lineHeight)
 
     cursorCtx.fillStyle = theme.background
-    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", (len + cursorPos) * charWidth + xPadding, end.y * lineHeight)
+    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", (len + cursorPos) * charWidth + xPadding, y * lineHeight)
 }
 
 init("hello world")
