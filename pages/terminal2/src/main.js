@@ -243,7 +243,7 @@ function drawCanvas()
     cursorCtx.fillText(input, x * charWidth + xPadding, y * lineHeight);
 
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(((len - 1) + cursorPos) * charWidth + xPadding, end.y * lineHeight + 3, charWidth, lineHeight)
+    cursorCtx.fillRect((len + cursorPos) * charWidth + xPadding, end.y * lineHeight + 3, charWidth, lineHeight)
 
     cursorCtx.fillStyle = theme.background
     cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", (len + cursorPos) * charWidth + xPadding, end.y * lineHeight)
