@@ -38,10 +38,8 @@ export default class Terminal
         this._rawText += string;
         if(string.includes("\n") && !this._rawTextContainsNewline) this._rawTextContainsNewline = true;
 
-        let lastSymbol = this._textSymbols[this._textSymbols.length - 1]
-
         let split = string.split(/(?=\n)/g)
-        for(var i = 1; i < split.length; i++)
+        for(var i = string.startsWith("\n"); i < split.length; i++)
         {
             this._textSymbols.push(new TextSymbol(split[i], color));
         }
@@ -98,7 +96,7 @@ export default class Terminal
      */
     Write(string)
     {
-        this._addSymbol(string, this.GetColor())
+        this._addSymbol(string, this._drawingState.color)
         this.Redraw();
     }
 
@@ -107,7 +105,7 @@ export default class Terminal
      */
     WriteLine(string)
     {
-        this._addSymbol("\n" + string, this.GetColor())
+        this._addSymbol("\n" + string, this._drawingState.color)
         this.Redraw();
     }
 
