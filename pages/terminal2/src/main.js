@@ -164,19 +164,6 @@ const logger = new Logger((entries) => {
 
 globalThis.logger = logger;
 
-function renderOutput(entries)
-{
-    for(var i = 0; i < entries.length; i++)
-    {
-        const ln = entries[i]
-
-        if(ln.type == "Warning") terminal.SetColor("#eaab3d")
-        if(ln.type == "Error") terminal.SetColor("#f62d33")
-
-        terminal.WriteLine(ln.message)
-    }
-}
-
 /**@type {CanvasRenderingContext2D} */
 const textCtx = document.getElementById("text").getContext("2d")
 /**@type {CanvasRenderingContext2D} */
@@ -206,6 +193,25 @@ terminal.SetLineHeight(lineHeight)
 terminal.SetMaxColumns(maxColumns)
 terminal.SetXPadding(xPadding)
 
+function renderOutput(entries)
+{
+    if(!entries)
+    {
+        terminal.Clear()
+        return;
+    }
+
+    for(var i = 0; i < entries.length; i++)
+    {
+        const ln = entries[i]
+
+        if(ln.type == "Warning") terminal.SetColor("#eaab3d")
+        if(ln.type == "Error") terminal.SetColor("#f62d33")
+
+        terminal.WriteLine(ln.message)
+    }
+}
+
 function drawCanvas()
 {
     cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
@@ -233,8 +239,11 @@ function drawCanvas()
     cursorCtx.fillText("$ ", x * charWidth + xPadding, y * lineHeight);
     x += 2
 
+    cursorCtx.fillStyle = theme.foreground;
+    cursorCtx.fillText(input, x * charWidth + xPadding, y * lineHeight);
+
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(((len - 1) + cursorPos) * charWidth + xPadding, (end.y - 1) * lineHeight + 3, charWidth, lineHeight)
+    cursorCtx.fillRect(((len - 1) + cursorPos) * charWidth + xPadding, end.y * lineHeight + 3, charWidth, lineHeight)
 
     cursorCtx.fillStyle = theme.background
     cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", (len + cursorPos) * charWidth + xPadding, end.y * lineHeight)
