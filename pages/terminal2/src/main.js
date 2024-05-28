@@ -1,9 +1,18 @@
+import Terminal from "./lib/CanvasRenderer.js";
 import { CommandParser } from "./lib/CommandParser.js"
 import Logger from "./lib/Logger.js"
 import ThemeColorSet from "./lib/ThemeColorSet.js"
 import * as minifs from "./lib/minifs.js"
 
 'use strict';
+
+globalThis.global = {
+    user: "user",
+    device: "terminal2",
+    cwd: "~",
+    canType: true,
+    theme: ThemeColorSet.Default,
+}
 
 /**
  * @param {string} string
@@ -29,14 +38,6 @@ let input = ""
 let cursorPos = 0
 
 let pastingAll = false;
-
-globalThis.global = {
-    user: "user",
-    device: "terminal2",
-    cwd: "~",
-    canType: true,
-    theme: ThemeColorSet.Default,
-}
 
 const theme = global.theme;
 
@@ -165,25 +166,15 @@ globalThis.logger = logger;
 
 function renderOutput(entries)
 {
-    if(!entries) { output.value = ""; return; }
-
-    let str = ""
     for(var i = 0; i < entries.length; i++)
     {
         const ln = entries[i]
 
-        let type = ""
-        if(ln.type == "Warning") type = " warn"
-        if(ln.type == "Error") type = " error"
+        if(ln.type == "Warning") terminal.SetColor("#eaab3d")
+        if(ln.type == "Error") terminal.SetColor("#f62d33")
 
-        let shift = ""
-        if(ln.message.startsWith("> ")) shift = ` style="margin-left: -2ch;"`
-
-        let txt = ln.message
-
-        str += `<span class="line${type}"${shift}>${txt}</span>`
+        terminal.WriteLine(ln.message)
     }
-    output.value = str
 }
 
 /**@type {CanvasRenderingContext2D} */
@@ -209,46 +200,44 @@ const maxRows = Math.floor(textCtx.canvas.height / lineHeight)
 
 const xPadding = 2;
 
+const terminal = new Terminal(textCtx)
+terminal.SetCharWidth(charWidth)
+terminal.SetLineHeight(lineHeight)
+terminal.SetMaxColumns(maxColumns)
+terminal.SetXPadding(xPadding)
+
 function drawCanvas()
 {
-    textCtx.fillStyle = theme.background;
-    textCtx.fillRect(0, 0, textCtx.canvas.width, textCtx.canvas.height);
-
-    textCtx.fillStyle = theme.foreground;
-    textCtx.font = font;
-
-    let str = global.user + "@" + global.device + ":" + global.cwd + "$ "
-    let x = 0
-    let y = 1 - 3/lineHeight
-
-    textCtx.fillStyle = theme.user;
-    textCtx.fillText(global.user + "@" + global.device, x * charWidth + xPadding, y * lineHeight);
-    x += (global.user + "@" + global.device).length
-
-    textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(":", x * charWidth + xPadding, y * lineHeight);
-    x++
-
-    textCtx.fillStyle = theme.path;
-    textCtx.fillText(global.cwd, x * charWidth + xPadding, y * lineHeight);
-    x += global.cwd.length
-
-    textCtx.fillStyle = theme.foreground;
-    textCtx.fillText("$ ", x * charWidth + xPadding, y * lineHeight);
-    x += 2
-
-    textCtx.fillStyle = theme.foreground;
-    textCtx.fillText(input, x * charWidth + xPadding, y * lineHeight);
-
-
     cursorCtx.clearRect(0, 0, cursorCtx.canvas.width, cursorCtx.canvas.height)
     cursorCtx.font = font;
 
+    const end = terminal.GetEndPosition()
+    let x = 0
+    let y = end.y + 1
+
+    let len = (global.user + "@" + global.device + ":" + global.cwd + "$ ").length
+
+    cursorCtx.fillStyle = theme.user;
+    cursorCtx.fillText(global.user + "@" + global.device, x * charWidth + xPadding, y * lineHeight);
+    x += (global.user + "@" + global.device).length
+
+    cursorCtx.fillStyle = theme.foreground;
+    cursorCtx.fillText(":", x * charWidth + xPadding, y * lineHeight);
+    x++
+
+    cursorCtx.fillStyle = theme.path;
+    cursorCtx.fillText(global.cwd, x * charWidth + xPadding, y * lineHeight);
+    x += global.cwd.length
+
+    cursorCtx.fillStyle = theme.foreground;
+    cursorCtx.fillText("$ ", x * charWidth + xPadding, y * lineHeight);
+    x += 2
+
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(str.length * charWidth + cursorPos * charWidth + xPadding, (y - 1) * lineHeight + 3, charWidth, lineHeight)
+    cursorCtx.fillRect(((len - 1) + cursorPos) * charWidth + xPadding, (end.y - 1) * lineHeight + 3, charWidth, lineHeight)
 
     cursorCtx.fillStyle = theme.background
-    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", str.length * charWidth + cursorPos * charWidth + xPadding, y * lineHeight)
+    cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", (len + cursorPos) * charWidth + xPadding, end.y * lineHeight)
 }
 
 init("hello world")

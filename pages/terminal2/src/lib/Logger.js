@@ -20,6 +20,8 @@ export default class Logger
 
     _log(_type)
     {
+        const arr = []
+
         Array.from(arguments).forEach((value, i) => {
             if(i == 0) return;
 
@@ -30,13 +32,16 @@ export default class Logger
 
             this.lines.push(str)
 
-            this.entries.push({
+            const entry = {
                 type: _type,
                 message: str
-            })
+            }
+
+            this.entries.push(entry)
+            arr.push(entry)
         })
 
-        this.onSubmit(this.entries)
+        this.onSubmit(arr)
 
         return this.entries.length
     }
