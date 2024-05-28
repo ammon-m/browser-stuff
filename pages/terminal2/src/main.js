@@ -205,6 +205,7 @@ function renderOutput(entries)
     {
         const ln = entries[i]
 
+        terminal.SetColor(theme.foreground)
         if(ln.type == "Warning") terminal.SetColor("#eaab3d")
         if(ln.type == "Error") terminal.SetColor("#f62d33")
 
@@ -219,7 +220,7 @@ function drawCanvas()
 
     const end = terminal.GetEndPosition()
     let x = 0
-    let y = end.y
+    let y = end.y - terminal._scroll
 
     let len = (global.user + "@" + global.device + ":" + global.cwd + "$ ").length
 
