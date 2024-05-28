@@ -38,8 +38,8 @@ export default class Terminal
         this._rawText += string;
         if(string.includes("\n") && !this._rawTextContainsNewline) this._rawTextContainsNewline = true;
 
-        let split = string.split(/(?=\n)/g)
-        for(var i = string.startsWith("\n"); i < split.length; i++)
+        let split = string.split(/(?=\n)/)
+        for(var i = 0; i < split.length; i++)
         {
             this._textSymbols.push(new TextSymbol(split[i], color));
         }
