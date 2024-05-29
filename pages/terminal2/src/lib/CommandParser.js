@@ -151,7 +151,7 @@ export class CommandParser
                             break;
                     }
                     this.End();
-                    break;
+                    return;
                 }
                 case "pop":
                 {
@@ -174,13 +174,13 @@ export class CommandParser
                         logger.log(str)
                     }
                     logger.log("")
-                    break;
+                    return;
                 }
                 case "flush":
                 {
                     this.End();
                     global.stack = {}
-                    break;
+                    return;
                 }
             }
             throw new SyntaxError("First argument must be one of: push, pop, list, or flush\n");
