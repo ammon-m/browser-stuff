@@ -85,6 +85,8 @@ const commandsList =
             global.user = event.parameters[0].value
         }
     },
+
+    stack: (event) => {},
 }
 
 const commandsHelp =
@@ -93,7 +95,7 @@ const commandsHelp =
     echo: "prints the value to the log",
     clear: "clears the log",
     user: "prints the string as raw html to the log",
-    stack: "provides basic functionality that allows the user to read and write to the variable stack"
+    stack: "provides basic functionality that allows the user to read and write to the variable stack",
 }
 
 export class CommandParser
