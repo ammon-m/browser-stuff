@@ -55,8 +55,8 @@ const commandsList =
     help: (event) => {
         const cmd = event.parameters[0]
         if(cmd.type == "EoL")
-            logger.log("List of all available commands" + "\n  " + (Object.keys(commandsList).join("\n  "))
-            + "\n\nUse help <command> to learn more about a specific command")
+            logger.log("List of all available commands:\n  " + (Object.keys(commandsList).join("\n  "))
+            + "\n\nUse help <command> to learn more about a specific command\n")
         else if(!commandsList.hasOwnProperty(cmd.value))
             logger.error(new SyntaxError(`Unknown command '${cmd.value}'`))
         else if(!commandsHelp.hasOwnProperty(cmd.value))
@@ -65,7 +65,7 @@ const commandsList =
     },
 
     /** @param {CommandExecutionEvent} event */
-    print: (event) => {
+    echo: (event) => {
         if(event.parameters[0].value == "")
             logger.error(new SyntaxError("First argument of print cannot be an empty string"))
         else logger.log(
@@ -92,7 +92,7 @@ const commandsList =
 const commandsHelp =
 {
     help: "the ever helpful help command, helps you get some of that sweet help when you need it",
-    print: "prints the string as raw html to the log",
+    echo: "prints the value to the log",
     clear: "clears the log",
     user: "prints the string as raw html to the log",
 }
@@ -106,10 +106,10 @@ export class CommandParser
             this.End(),
         ], commandsList.help),
 
-        print: () => new Command("print", [
+        echo: () => new Command("echo", [
             this.String(),
             this.End(),
-        ], commandsList.print),
+        ], commandsList.echo),
 
         clear: () => new Command("clear", [
             this.End(),
@@ -165,10 +165,11 @@ export class CommandParser
 
     String()
     {
-        const token = this.eat('string')
+        const token = this.eat('string literal')
+        const string = token.value.startsWith('"') || token.value.startsWith("'")
         return {
             type: "String",
-            value: token.value.slice(1, token.value.length - 1) // remove quotes
+            value: string ? token.value.slice(1, token.value.length - 1) : token.value // remove quotes
         }
     }
 

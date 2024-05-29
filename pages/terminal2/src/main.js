@@ -11,7 +11,7 @@ globalThis.global = {
     device: "terminal2",
     cwd: "~",
     canType: true,
-    theme: ThemeColorSet.Default,
+    theme: Object.freeze(ThemeColorSet.Default),
 }
 
 /**
@@ -55,7 +55,6 @@ function init(motd)
 
         if(event.code == "Enter")
         {
-            cursorPos = 0
             receiveUserCommand(input)
             event.preventDefault()
         }
@@ -63,6 +62,7 @@ function init(motd)
         {
             input = input.slice(0, cursorPos - 1) + input.slice(cursorPos)
             cursorPos--
+            drawCanvas();
             event.preventDefault()
         }
         else if(event.code == "ArrowUp" && commandHistory.length > 0 && !event.shiftKey)
@@ -70,6 +70,7 @@ function init(motd)
             if(--commandHistoryPos < 0) commandHistoryPos = 0
             input = commandHistory[commandHistoryPos]
             cursorPos = input.length
+            drawCanvas();
             event.preventDefault()
         }
         else if(event.code == "ArrowDown" && commandHistory.length > 0 && !event.shiftKey)
@@ -80,23 +81,27 @@ function init(motd)
             else
                 input = commandHistory[commandHistoryPos]
             cursorPos = input.length
+            drawCanvas();
             event.preventDefault()
         }
         else if(event.code == "ArrowLeft" && !event.shiftKey)
         {
             if(event.ctrlKey) cursorPos = 0
             else if(cursorPos >= 1) cursorPos--
+            drawCanvas();
         }
         else if(event.code == "ArrowRight" && !event.shiftKey)
         {
             if(event.ctrlKey) cursorPos = input.length
             else if(cursorPos <= input.length - 1) cursorPos++
+            drawCanvas();
         }
         else if(event.key.match(/[\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/) && event.key.length == 1 && !event.ctrlKey && !event.metaKey)
         {
             input = stringReplaceShift(input, cursorPos, event.key)
             cursorPos++;
             commandHistoryPos = commandHistory.length
+            drawCanvas();
             event.preventDefault()
         }
         else if(event.code == "KeyV" && event.ctrlKey && event.shiftKey)
@@ -116,6 +121,7 @@ function init(motd)
         input = stringReplaceShift(input, cursorPos, str)
         cursorPos += str.length
         commandHistoryPos = commandHistory.length
+        drawCanvas();
 
         pastingAll = false;
         event.preventDefault();
@@ -127,7 +133,7 @@ function init(motd)
  */
 function receiveUserCommand(value)
 {
-    if(!value || value == "") return;
+    if(!value) return;
 
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
@@ -146,9 +152,12 @@ function receiveUserCommand(value)
 
     terminal.Write(value)
 
+    if(value == "") return;
+
     console.log(value)
 
     input = ""
+    cursorPos = 0
 
     const parser = new CommandParser()
     let command = null
@@ -165,6 +174,8 @@ function receiveUserCommand(value)
     if(command == null) return;
 
     command.execute()
+
+    drawCanvas()
 }
 
 /**@type {string[]}*/
@@ -218,9 +229,9 @@ function renderOutput(entries)
     {
         const ln = entries[i]
 
-        terminal.SetColor(theme.foreground)
-        if(ln.type == "Warning") terminal.SetColor("#eaab3d")
-        if(ln.type == "Error") terminal.SetColor("#f62d33")
+        terminal.SetColor(global.theme.foreground)
+        if(ln.type == "Warning") terminal.SetColor(global.theme.warning)
+        if(ln.type == "Error") terminal.SetColor(global.theme.error)
 
         terminal.WriteLine(ln.message)
     }
@@ -264,5 +275,3 @@ function drawCanvas()
 }
 
 init("hello world")
-
-setInterval(drawCanvas, 1000 / 60)

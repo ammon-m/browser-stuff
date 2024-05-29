@@ -143,15 +143,15 @@ export default class Terminal
 
         this._textSymbols.forEach((symbol, i) =>
         {
-            let str = symbol.Value.slice(0)
+            let str = symbol.Value;
             if(str.startsWith("\n") || x + str.length > this.maxColumns)
             {
-                x = 0
-                y++
+                x = 0;
+                y++;
             }
             if(y < this._scroll) return;
 
-            str = str.replace("\n", "")
+            str = str.replace("\n", "");
 
             this.ctx.fillStyle = symbol.Color;
             this.ctx.fillText(str, x * this.charWidth + this.xPadding, y * this.lineHeight)
