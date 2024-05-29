@@ -148,6 +148,12 @@ function init(motd)
         pastingAll = false;
         event.preventDefault();
     }, false)
+
+    window.addEventListener("wheel", event => {
+        const val = Math.sign(event.deltaY);
+
+        terminal.Scroll(-val);
+    });
 }
 
 /**
@@ -249,6 +255,7 @@ const terminal = new Terminal(textCtx)
 terminal.SetCharWidth(charWidth)
 terminal.SetLineHeight(lineHeight)
 terminal.SetMaxColumns(maxColumns)
+terminal.SetMaxRows(maxRows)
 terminal.SetXPadding(xPadding)
 terminal.onRedraw = () => {
     drawCanvas()

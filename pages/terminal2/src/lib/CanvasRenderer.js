@@ -21,7 +21,8 @@ export default class Terminal
 
     charWidth = 10
     lineHeight = 16
-    maxColumns = 50
+    maxColumns = 100
+    maxRows = 50
     xPadding = 0
 
     /**
@@ -92,8 +93,7 @@ export default class Terminal
 
     Scroll(amount)
     {
-        this._scroll = Math.min(Math.max(this._scroll + amount, 0), this._rawText.split("\n").length - 1)
-        this.Redraw();
+        this.ScrollTo(this._scroll + amount)
     }
 
     ScrollTo(amount)
@@ -117,7 +117,7 @@ export default class Terminal
      */
     Write(string)
     {
-        this._addSymbol(string)
+        this._addSymbol(string);
         this.Redraw();
     }
 
@@ -126,7 +126,7 @@ export default class Terminal
      */
     WriteLine(string)
     {
-        this._addSymbol((this._rawText.length > 0 ? "\n" : "") + string)
+        this._addSymbol((this._rawText.length > 0 ? "\n" : "") + string);
         this.Redraw();
     }
 
@@ -145,6 +145,12 @@ export default class Terminal
     SetMaxColumns(columns)
     {
         this.maxColumns = columns;
+        this.Redraw();
+    }
+
+    SetMaxRows(rows)
+    {
+        this.maxRows = rows;
         this.Redraw();
     }
 
