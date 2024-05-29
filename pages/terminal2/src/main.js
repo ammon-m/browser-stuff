@@ -64,7 +64,12 @@ function init(motd)
         console.log(motd)
     }
 
-    terminal.WriteLine(`Welcome to Conch, an experimental browser-based shell [v${VERSION}]\nLicensed under the MIT license.\n`)
+    terminal.WriteLine("Welcome to ")
+    terminal.SetBold(true)
+    terminal.Write("Conch")
+    terminal.SetBold(false)
+    terminal.Write(` [v${VERSION}]\nAn experimental browser-based shell\n`)
+    drawCanvas()
 
     window.addEventListener("keydown", event => {
         if(!global.canType) return;

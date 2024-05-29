@@ -33,7 +33,7 @@ export default class Terminal
         this.SetColor(Terminal.Colors.foreground)
     }
 
-    _addSymbol(string, color)
+    _addSymbol(string)
     {
         this._rawText += string;
         if(string.includes("\n") && !this._rawTextContainsNewline) this._rawTextContainsNewline = true;
@@ -41,7 +41,7 @@ export default class Terminal
         let split = string.split(/(?=\n)/)
         for(var i = 0; i < split.length; i++)
         {
-            this._textSymbols.push(new TextSymbol(split[i], color));
+            this._textSymbols.push(new TextSymbol(split[i], this.GetColor(), this.GetBold(), this.GetItalic()));
         }
     }
 
@@ -54,9 +54,9 @@ export default class Terminal
         this.ResetColor()
     }
 
-    ResetColor()
+    GetColor()
     {
-        this._drawingState.color = Terminal.Colors.foreground;
+        return this._drawingState.color
     }
 
     SetColor(colorCssString)
@@ -64,9 +64,29 @@ export default class Terminal
         this._drawingState.color = colorCssString;
     }
 
-    GetColor()
+    ResetColor()
     {
-        return this._drawingState.color
+        this._drawingState.color = Terminal.Colors.foreground;
+    }
+
+    GetBold()
+    {
+        return this._drawingState.bold
+    }
+
+    SetBold(bold)
+    {
+        this._drawingState.bold = bold;
+    }
+
+    GetItalic()
+    {
+        return this._drawingState.italic
+    }
+
+    SetItalic(italic)
+    {
+        this._drawingState.italic = italic;
     }
 
     Scroll(amount)
@@ -96,7 +116,7 @@ export default class Terminal
      */
     Write(string)
     {
-        this._addSymbol(string, this._drawingState.color)
+        this._addSymbol(string)
         this.Redraw();
     }
 
@@ -105,7 +125,7 @@ export default class Terminal
      */
     WriteLine(string)
     {
-        this._addSymbol((this._rawText.length > 0 ? "\n" : "") + string, this._drawingState.color)
+        this._addSymbol((this._rawText.length > 0 ? "\n" : "") + string)
         this.Redraw();
     }
 
@@ -141,6 +161,9 @@ export default class Terminal
         let x = 0;
         let y = 1 - 3/this.lineHeight;
 
+        const ogFont = this.ctx.font;
+        const ogColor = this.ctx.fillStyle;
+
         this._textSymbols.forEach((symbol, i) =>
         {
             let str = symbol.Value;
@@ -153,11 +176,15 @@ export default class Terminal
 
             str = str.replace("\n", "");
 
+            this.ctx.font = (this.GetItalic() ? "italic " : "") + (this.GetBold() ? "bold " : "") + ogFont;
             this.ctx.fillStyle = symbol.Color;
             this.ctx.fillText(str, x * this.charWidth + this.xPadding, y * this.lineHeight)
 
             x += str.length
         })
+
+        this.ctx.font = ogFont;
+        this.ctx.fillStyle = ogColor;
     }
 
     GetEndPosition()
@@ -184,11 +211,15 @@ class TextSymbol
 {
     Value;
     Color;
+    Bold;
+    Italic;
 
-    constructor(string = "", color = "#ffffff")
+    constructor(string = "", color = "#ffffff", bold = false, italic = false)
     {
         this.Value = string
         this.Color = color
+        this.Bold = bold
+        this.Italic = italic
     }
 
     ToString()
@@ -200,6 +231,8 @@ class TextSymbol
 class DrawingState
 {
     color = "#ffffff"
+    bold = false
+    italic = false
 }
 
 // syntax:
