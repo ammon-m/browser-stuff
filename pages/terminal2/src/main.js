@@ -8,7 +8,7 @@ import * as minifs from "./lib/minifs.js"
 
 globalThis.global = {
     user: "user",
-    device: "terminal2",
+    device: "vm",
     cwd: "~",
     canType: true,
     theme: Object.freeze(ThemeColorSet.Default),
@@ -198,7 +198,18 @@ function receiveUserCommand(value)
     }
     if(command == null) return;
 
-    command.execute()
+    try
+    {
+        command.execute()
+    }
+    catch(error)
+    {
+        error.name = "CommandExecutionError"
+        logger.error(error)
+
+        error.name = "[Conch] " + error.name
+        console.error(error)
+    }
 }
 
 /**@type {string[]}*/
