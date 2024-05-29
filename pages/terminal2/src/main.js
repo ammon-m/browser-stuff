@@ -220,6 +220,9 @@ function receiveUserCommand(value)
         error.name = "[Conch] " + error.name
         console.error(error)
     }
+
+    let y = terminal.GetEndPosition().y
+    terminal.ScrollTo(y - maxRows)
 }
 
 /**@type {string[]}*/

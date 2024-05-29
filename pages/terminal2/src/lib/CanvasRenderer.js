@@ -193,8 +193,6 @@ export default class Terminal
         this.ctx.font = ogFont;
         this.ctx.fillStyle = ogColor;
 
-        this.ScrollTo((y + 3/this.lineHeight) - this.maxRows)
-
         this.onRedraw()
     }
 
