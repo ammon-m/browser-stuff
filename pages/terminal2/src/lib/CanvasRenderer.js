@@ -176,7 +176,7 @@ export default class Terminal
 
             str = str.replace("\n", "");
 
-            this.ctx.font = (this.GetItalic() ? "italic " : "") + (this.GetBold() ? "bold " : "") + ogFont;
+            this.ctx.font = (symbol.Italic ? "italic " : "") + (symbol.Bold ? "bold " : "") + ogFont;
             this.ctx.fillStyle = symbol.Color;
             this.ctx.fillText(str, x * this.charWidth + this.xPadding, y * this.lineHeight)
 
