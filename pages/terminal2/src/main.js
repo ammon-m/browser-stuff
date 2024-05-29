@@ -170,7 +170,7 @@ function receiveUserCommand(value)
 
     if(value == "") return;
 
-    console.log(value)
+    console.log("[Conch] " + value)
 
     input = ""
     cursorPos = 0
@@ -185,6 +185,9 @@ function receiveUserCommand(value)
     catch(error)
     {
         logger.error(error)
+
+        error.name = "[Conch] " + error.name
+        console.error(error)
         return;
     }
     if(command == null) return;
