@@ -326,8 +326,10 @@ function drawCanvas()
 
     cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, 0, charWidth, cursorCtx.canvas.height)
 
+    const totalLines = terminal._rawText.split("\n").length;
+
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, (terminal._scroll / (terminal._rawText.split("\n").length + 2)) * cursorCtx.canvas.height, charWidth, (maxRows / (terminal._rawText.split("\n").length + 2)) * cursorCtx.canvas.height)
+    cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, (Math.max(0, terminal._scroll - totalLines + 1) / (totalLines + 2)) * cursorCtx.canvas.height, charWidth, ((maxRows + 3/lineHeight) / (totalLines + 2) + 3/lineHeight) * cursorCtx.canvas.height)
 }
 
 init("hello world")
