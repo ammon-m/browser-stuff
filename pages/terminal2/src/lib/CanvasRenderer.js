@@ -52,6 +52,7 @@ export default class Terminal
         this._textSymbols = []
         this._scroll = 0
         this.ResetColor()
+        this.Redraw()
     }
 
     GetColor()
@@ -185,7 +186,11 @@ export default class Terminal
 
         this.ctx.font = ogFont;
         this.ctx.fillStyle = ogColor;
+
+        this.onRedraw()
     }
+
+    onRedraw = () => {}
 
     GetEndPosition()
     {

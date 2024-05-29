@@ -71,7 +71,6 @@ function init(motd)
     terminal.Write("Conch")
     terminal.SetBold(false)
     terminal.Write(` [v${VERSION}]\nAn experimental browser-based shell\n`)
-    drawCanvas()
 
     window.addEventListener("keydown", event => {
         if(!global.canType) return;
@@ -200,8 +199,6 @@ function receiveUserCommand(value)
     if(command == null) return;
 
     command.execute()
-
-    drawCanvas()
 }
 
 /**@type {string[]}*/
@@ -242,13 +239,15 @@ terminal.SetCharWidth(charWidth)
 terminal.SetLineHeight(lineHeight)
 terminal.SetMaxColumns(maxColumns)
 terminal.SetXPadding(xPadding)
+terminal.onRedraw = () => {
+    drawCanvas()
+}
 
 function renderOutput(entries)
 {
     if(!entries)
     {
         terminal.Clear()
-        drawCanvas()
         return;
     }
 
@@ -261,7 +260,6 @@ function renderOutput(entries)
         if(ln.type == "Error") terminal.SetColor(global.theme.error)
 
         terminal.WriteLine(ln.message)
-        drawCanvas()
     }
 }
 
