@@ -161,6 +161,7 @@ export default class Terminal
 
         for(var i = 0; i < this._rawText.length; i++)
         {
+            if(i == 0) y++
             x++
             if(this._rawText[i] == "\n")
             {
@@ -169,7 +170,7 @@ export default class Terminal
             }
         }
 
-        return {x, y: y + (this._rawText.length > 0)};
+        return {x, y};
     }
 }
 
