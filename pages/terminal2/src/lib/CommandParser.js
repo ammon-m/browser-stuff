@@ -126,6 +126,7 @@ export class CommandParser
             switch(event.parameters[0].value)
             {
                 case "push":
+                {
                     const arg1 = this.Literal();
                     const arg2 = this.lexer.peekToken();
                     switch(arg2.type)
@@ -149,13 +150,17 @@ export class CommandParser
                     }
                     this.End();
                     break;
+                }
                 case "pop":
+                {
                     const arg1 = this.Literal();
                     this.End();
                     const r = global.stack[arg1.value];
                     global.stack[arg1.value] = undefined;
                     return r;
+                }
                 case "list":
+                {
                     this.End();
                     logger.log("\nname            value")
                     for(const key of Object.keys(global.stack))
@@ -168,10 +173,13 @@ export class CommandParser
                     }
                     logger.log("")
                     break;
+                }
                 case "flush":
+                {
                     this.End();
                     global.stack = {}
                     break;
+                }
             }
             throw new SyntaxError("First argument must be one of: push, pop, list, or flush\n");
         }),
