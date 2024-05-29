@@ -156,7 +156,7 @@ function init(motd)
         const val = Math.round(scroll);
         scroll -= val;
 
-        terminal.Scroll(-val);
+        terminal.Scroll(val);
     });
 }
 
