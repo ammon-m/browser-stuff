@@ -131,7 +131,20 @@ function receiveUserCommand(value)
 
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
-    logger.log("> " + value)
+    
+    terminal.SetColor(global.theme.user)
+    terminal.WriteLine(global.user + "@" + global.device)
+
+    terminal.SetColor(global.theme.foreground)
+    terminal.Write(":")
+
+    terminal.SetColor(global.theme.path)
+    terminal.Write(global.cwd)
+
+    terminal.SetColor(global.theme.foreground)
+    terminal.Write("$ ")
+
+    terminal.Write(value)
 
     console.log(value)
 
