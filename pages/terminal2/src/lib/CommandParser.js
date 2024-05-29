@@ -197,7 +197,7 @@ export class CommandParser
 
     Command()
     {
-        let name = this.Literal()
+        let name = this.eat('*')
 
         if(this.commands.hasOwnProperty(name.value)) return this.commands[name.value]();
 
