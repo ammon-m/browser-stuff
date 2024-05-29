@@ -281,7 +281,7 @@ export class CommandParser
         let token = this.lookAhead()
 
         if(!token || (!types.includes(token.type) && token.type == 'EoL'))
-            throw new SyntaxError(`Unexpected end of input`)
+            throw new SyntaxError(`Unexpected end of input\n`)
 
         if(types.includes(token.type) || tokenType == "*")
             return token
@@ -290,7 +290,7 @@ export class CommandParser
         if(types.length > 1)
             expected = types.join(" | ")
 
-        throw new SyntaxError(`Unexpected symbol \`${token.value}\`, expected ${expected} (at position ${this.lexer.pos.index - 1})`)
+        throw new SyntaxError(`Unexpected symbol \`${token.value}\`, expected ${expected} at position ${this.lexer.pos.index - 1}\n`)
     }
 }
 
@@ -338,7 +338,7 @@ class Lexer
         }
 
         if (token === null) {
-            throw new SyntaxError(`Invalid symbol ${this.slice[0]} at position ${this.pos.index}`)
+            throw new SyntaxError(`Invalid symbol ${this.slice[0]} at position ${this.pos.index}\n`)
         }
 
         return token;
