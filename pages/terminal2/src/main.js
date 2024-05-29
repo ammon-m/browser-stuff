@@ -131,7 +131,7 @@ function receiveUserCommand(value)
 
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
-    
+
     terminal.SetColor(global.theme.user)
     terminal.WriteLine(global.user + "@" + global.device)
 

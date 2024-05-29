@@ -153,10 +153,10 @@ export default class Terminal
 
             str = str.replace("\n", "")
 
-            x += str.length
-
             this.ctx.fillStyle = symbol.Color;
             this.ctx.fillText(str, x * this.charWidth + this.xPadding, y * this.lineHeight)
+
+            x += str.length
         })
     }
 
