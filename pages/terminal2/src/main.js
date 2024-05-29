@@ -149,8 +149,12 @@ function init(motd)
         event.preventDefault();
     }, false)
 
+    let scroll = 0
+
     window.addEventListener("wheel", event => {
-        const val = event.deltaY / 120;
+        scroll += event.deltaY / 60;
+        const val = Math.round(scroll);
+        scroll -= val;
 
         terminal.Scroll(-val);
     });

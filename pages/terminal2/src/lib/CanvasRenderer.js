@@ -185,7 +185,7 @@ export default class Terminal
 
             this.ctx.font = (symbol.Italic ? "italic " : "") + (symbol.Bold ? "bold " : "") + ogFont;
             this.ctx.fillStyle = symbol.Color;
-            this.ctx.fillText(str, x * this.charWidth + this.xPadding, y * this.lineHeight)
+            this.ctx.fillText(str, x * this.charWidth + this.xPadding, (y - this._scroll) * this.lineHeight)
 
             x += str.length
         })
