@@ -222,6 +222,7 @@ function renderOutput(entries)
     if(!entries)
     {
         terminal.Clear()
+        drawCanvas()
         return;
     }
 
@@ -234,6 +235,7 @@ function renderOutput(entries)
         if(ln.type == "Error") terminal.SetColor(global.theme.error)
 
         terminal.WriteLine(ln.message)
+        drawCanvas()
     }
 }
 
