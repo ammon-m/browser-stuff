@@ -137,7 +137,7 @@ export class CommandParser
                             throw new SyntaxError("support for expressions not yet implemented\n");
                         case "EoL":
                             global.stack[arg1.value] = "";
-                            break;
+                            return;
                         case "string":
                             global.stack[arg1.value] = arg2.value.slice(1, arg2.value.length - 1);
                             break;
@@ -151,11 +151,12 @@ export class CommandParser
                     break;
                 case "pop":
                     const arg1 = this.Literal();
+                    this.End();
                     const r = global.stack[arg1.value];
                     global.stack[arg1.value] = undefined;
-                    this.End();
                     return r;
                 case "list":
+                    this.End();
                     logger.log("\nname            value")
                     for(const key of Object.keys(global.stack))
                     {
@@ -166,9 +167,9 @@ export class CommandParser
                         logger.log(str)
                     }
                     logger.log("")
-                    this.End();
                     break;
                 case "flush":
+                    this.End();
                     global.stack = {}
                     break;
             }
