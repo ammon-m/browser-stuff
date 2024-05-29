@@ -105,7 +105,7 @@ export default class Terminal
      */
     WriteLine(string)
     {
-        this._addSymbol("\n" + string, this._drawingState.color)
+        this._addSymbol((this._rawText.length > 0 ? "\n" : "") + string, this._drawingState.color)
         this.Redraw();
     }
 
