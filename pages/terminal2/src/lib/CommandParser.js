@@ -161,16 +161,32 @@ export class CommandParser
                 }
                 case "list":
                 {
-                    logger.log("\nname            value")
+                    let label = "\nname";
+                    let longest = 16;
+
                     for(const key of Object.keys(global.stack))
                     {
-                        let str = " " + key;
-                        for(var i = 0; i < 16 - key.length; i++)
+                        if(longest < key.length + 4)
+                            longest = key.length + 4;
+                    }
+
+                    for(var i = 0; i < longest - 4; i++)
+                        label += " ";
+                    label += "value";
+
+                    logger.log(label);
+
+                    for(const key of Object.keys(global.stack))
+                    {
+                        let str = "- " + key;
+                        for(var i = 0; i < longest - key.length; i++)
                             str += " ";
                         str += global.stack[key].toString();
-                        logger.log(str)
+
+                        logger.log(str);
                     }
-                    logger.log("")
+
+                    logger.log("");
                     return;
                 }
                 case "flush":
