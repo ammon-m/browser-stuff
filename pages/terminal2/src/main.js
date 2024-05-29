@@ -327,7 +327,7 @@ function drawCanvas()
     cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, 0, charWidth, cursorCtx.canvas.height)
 
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, (terminal._scroll / (terminal._rawText.split("\n").length + 2)) * cursorCtx.canvas.height, charWidth, (terminal._rawText.split("\n").length - 2) / maxRows)
+    cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, (terminal._scroll / (terminal._rawText.split("\n").length + 2)) * cursorCtx.canvas.height, charWidth, (maxRows / (terminal._rawText.split("\n").length + 2)) * cursorCtx.canvas.height)
 }
 
 init("hello world")
