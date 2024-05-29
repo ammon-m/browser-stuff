@@ -222,7 +222,7 @@ function receiveUserCommand(value)
     }
 
     let y = terminal.GetEndPosition().y
-    terminal.ScrollTo(y - maxRows)
+    terminal.ScrollTo(y + 3/lineHeight - maxRows)
 }
 
 /**@type {string[]}*/
