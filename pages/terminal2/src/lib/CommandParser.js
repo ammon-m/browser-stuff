@@ -6,7 +6,7 @@ const tokenTypes = Object.freeze({
     comma: /\,/,
     dot: /\./,
     number: /\d+(?:\.\d+)?/,
-    string: /(?:".*"|'.*')/,
+    string: /"(\\"|.)*"/,
     path: /[^\/\t]+(\/[^\/\t]+)*(\.[a-zA-Z0-9]+|\/)/,
     literal: /[a-zA-Z_][a-zA-Z_0-9]*/,
     boolean: /true|false/,
@@ -58,19 +58,17 @@ const commandsList =
             logger.log("List of all available commands:\n  " + (Object.keys(commandsList).join("\n  "))
             + "\n\nUse help <command> to learn more about a specific command\n")
         else if(!commandsList.hasOwnProperty(cmd.value))
-            logger.error(new SyntaxError(`Unknown command '${cmd.value}'`))
+            throw new SyntaxError(`Unknown command '${cmd.value}'\n`)
         else if(!commandsHelp.hasOwnProperty(cmd.value))
-            logger.log("[no documentation]")
-        else logger.log(commandsHelp[cmd.value])
+            logger.log("[no documentation]\n")
+        else logger.log(commandsHelp[cmd.value] + "\n")
     },
 
     /** @param {CommandExecutionEvent} event */
     echo: (event) => {
         if(event.parameters[0].value == "")
-            logger.error(new SyntaxError("First argument of print cannot be an empty string"))
-        else logger.log(
-            event.parameters[0].value
-        )
+            throw new SyntaxError("First argument of echo cannot be empty\n")
+        else logger.log(event.parameters[0].value)
     },
 
     /** @param {CommandExecutionEvent} event */
@@ -81,7 +79,7 @@ const commandsList =
     /** @param {CommandExecutionEvent} event */
     user: (event) => {
         if(event.parameters[0].value == "")
-            logger.error(new SyntaxError("First argument of user cannot be an empty string"))
+            throw new SyntaxError("First argument of user cannot be empty\n")
         else if(global.user != event.parameters[0].value)
         {
             global.user = event.parameters[0].value
@@ -95,6 +93,7 @@ const commandsHelp =
     echo: "prints the value to the log",
     clear: "clears the log",
     user: "prints the string as raw html to the log",
+    stack: "provides basic functionality that allows the user to read and write to the variable stack"
 }
 
 export class CommandParser
@@ -119,9 +118,68 @@ export class CommandParser
             this.String(),
             this.End(),
         ], commandsList.user),
+
+        /**@returns {Command} */
+        stack: () => new Command("stack", [
+            this.Literal(),
+        ], (event) => {
+            switch(event.parameters[0].value)
+            {
+                case "push":
+                    const arg1 = this.Literal();
+                    const arg2 = this.lexer.peekToken();
+                    switch(arg2.type)
+                    {
+                        case "opCurly":
+                        case "clCurly":
+                        case "opSquare":
+                        case "clSquare":
+                            throw new SyntaxError("support for expressions not yet implemented\n");
+                        case "EoL":
+                            global.stack[arg1.value] = "";
+                            break;
+                        case "string":
+                            global.stack[arg1.value] = arg2.value.slice(1, arg2.value.length - 1);
+                            break;
+                        case "literal":
+                        case "path":
+                        default:
+                            global.stack[arg1.value] = arg2.value;
+                            break;
+                    }
+                    this.End();
+                    break;
+                case "pop":
+                    const arg1 = this.Literal();
+                    const r = global.stack[arg1.value];
+                    global.stack[arg1.value] = undefined;
+                    this.End();
+                    return r;
+                case "list":
+                    logger.log("\nname            value")
+                    for(const key of Object.keys(global.stack))
+                    {
+                        let str = " " + key;
+                        for(var i = 0; i < 32 - str.length; i++)
+                            str += " ";
+                        str += global.stack[key].toString();
+                        logger.log(str)
+                    }
+                    logger.log("")
+                    this.End();
+                    break;
+                case "flush":
+                    global.stack = {}
+                    break;
+            }
+            throw new SyntaxError("First argument must be one of: push, pop, list, or flush\n");
+        }),
     }
 
-    /**@returns {Command} */
+    /**
+     * Throws {@linkcode SyntaxError} if the command fails at any point.
+     * @returns {Command}
+     */
     parse(string)
     {
         this.string = string
@@ -136,14 +194,14 @@ export class CommandParser
 
         if(this.commands.hasOwnProperty(name.value)) return this.commands[name.value]();
 
-        throw new SyntaxError(`Unknown command '${name.value}'`)
+        throw new SyntaxError(`Unknown command '${name.value}'\n`)
     }
 
     Literal()
     {
         const token = this.eat('literal')
         return {
-            type: "Word",
+            type: "literal",
             value: token.value
         }
     }
@@ -152,7 +210,7 @@ export class CommandParser
     {
         const token = this.eat('question')
         return {
-            type: "Operator",
+            type: "operator",
             value: token.value
         }
     }
@@ -168,7 +226,7 @@ export class CommandParser
         const token = this.eat('string literal')
         const string = token.value.startsWith('"') || token.value.startsWith("'")
         return {
-            type: "String",
+            type: "string",
             value: string ? token.value.slice(1, token.value.length - 1) : token.value // remove quotes
         }
     }
@@ -192,6 +250,7 @@ export class CommandParser
 
     /**
      * @param {string} tokenType
+     * @returns {Token}
      */
     eat(tokenType)
     {
@@ -201,7 +260,7 @@ export class CommandParser
         if(!token || (!types.includes(token.type) && token.type == 'EoL'))
             throw new SyntaxError(`Unexpected end of input`)
 
-        if(types.includes(token.type))
+        if(types.includes(token.type) || tokenType == "*")
             return token
 
         var expected = tokenType
@@ -235,20 +294,8 @@ class Lexer
 
     nextToken()
     {
-        var token = null;
+        var token = this.peekToken();
 
-        for (let _type in this.types) {
-            const e = this.types[_type].exec(this.slice) // REGEXXXXXX
-            if (e === null || e.index != 0)
-                continue;
-
-            token = new Token(_type, e[0]);
-            break;
-        }
-
-        if (token === null) {
-            throw new SyntaxError(`Invalid symbol ${this.slice[0]} at position ${this.pos.index}`)
-        }
         this.advance(token.value.length)
 
         return token;

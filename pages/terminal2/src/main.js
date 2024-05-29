@@ -12,6 +12,8 @@ globalThis.global = {
     cwd: "~",
     canType: true,
     theme: Object.freeze(ThemeColorSet.Default),
+
+    stack: {},
 }
 
 /**
