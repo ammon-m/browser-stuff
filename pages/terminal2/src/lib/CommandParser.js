@@ -165,7 +165,7 @@ export class CommandParser
                     for(const key of Object.keys(global.stack))
                     {
                         let str = " " + key;
-                        for(var i = 0; i < 32 - str.length; i++)
+                        for(var i = 0; i < 16 - key.length; i++)
                             str += " ";
                         str += global.stack[key].toString();
                         logger.log(str)
