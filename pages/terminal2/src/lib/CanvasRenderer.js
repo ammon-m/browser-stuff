@@ -169,7 +169,7 @@ export default class Terminal
             }
         }
 
-        return {x, y}
+        return {x, y: y + (this._rawText.length > 0)};
     }
 }
 
