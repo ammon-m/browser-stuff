@@ -140,7 +140,9 @@ export default class Terminal
 
         let x = 0;
         let y = 1 - 3/this.lineHeight;
-        this._textSymbols.forEach((symbol, i) => {
+
+        this._textSymbols.forEach((symbol, i) =>
+        {
             let str = symbol.Value.slice(0)
             if(str.startsWith("\n") || x + str.length > this.maxColumns)
             {
@@ -149,8 +151,12 @@ export default class Terminal
             }
             if(y < this._scroll) return;
 
+            str = str.replace("\n", "")
+
+            x += str.length
+
             this.ctx.fillStyle = symbol.Color;
-            this.ctx.fillText(str.replace("\n", ""), x * this.charWidth + this.xPadding, y * this.lineHeight)
+            this.ctx.fillText(str, x * this.charWidth + this.xPadding, y * this.lineHeight)
         })
     }
 
