@@ -50,7 +50,7 @@ export const VERSION = Object.preventExtensions({
     branch: "bleeding edge",
 
     toString: () => {
-        return `${breaking}.${update}.${patch}`;
+        return `${VERSION.breaking}.${VERSION.update}.${VERSION.patch}`;
     },
 })
 
