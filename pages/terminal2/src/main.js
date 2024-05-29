@@ -43,12 +43,28 @@ const theme = global.theme;
 
 export const fs = new minifs.FileSystem()
 
+export const VERSION = Object.preventExtensions({
+    breaking: 1,
+    update: 2,
+    patch: 0,
+    branch: "bleeding edge",
+
+    toString: () => {
+        return `${breaking}.${update}.${patch}`;
+    },
+})
+
 /**
  * @param {string} motd
  */
 function init(motd)
 {
-    if(motd) console.log(motd)
+    if(motd)
+    {
+        console.log(motd)
+    }
+
+    terminal.WriteLine(`Welcome to Conch, an experimental browser-based shell [v${VERSION}]\nLicensed under the MIT license.\n`)
 
     window.addEventListener("keydown", event => {
         if(!global.canType) return;
