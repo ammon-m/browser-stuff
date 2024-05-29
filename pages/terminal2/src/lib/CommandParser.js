@@ -11,6 +11,7 @@ const tokenTypes = Object.freeze({
     literal: /[a-zA-Z_][a-zA-Z_0-9]*/,
     boolean: /true|false/,
     question: /\?/,
+    dollar: /\$/,
     EoL: /\s*$/,
 })
 

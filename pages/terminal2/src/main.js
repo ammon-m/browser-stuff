@@ -150,7 +150,7 @@ function init(motd)
     }, false)
 
     window.addEventListener("wheel", event => {
-        const val = Math.sign(event.deltaY);
+        const val = event.deltaY / 120;
 
         terminal.Scroll(-val);
     });
