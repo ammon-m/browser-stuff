@@ -150,20 +150,17 @@ export class CommandParser
                             global.stack[arg1.value] = arg2.value;
                             break;
                     }
-                    this.End();
                     return;
                 }
                 case "pop":
                 {
                     const arg1 = this.Literal();
-                    this.End();
                     const r = global.stack[arg1.value];
                     global.stack[arg1.value] = undefined;
                     return r;
                 }
                 case "list":
                 {
-                    this.End();
                     logger.log("\nname            value")
                     for(const key of Object.keys(global.stack))
                     {
@@ -178,7 +175,6 @@ export class CommandParser
                 }
                 case "flush":
                 {
-                    this.End();
                     global.stack = {}
                     return;
                 }
