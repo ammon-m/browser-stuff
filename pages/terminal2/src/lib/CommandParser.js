@@ -142,7 +142,7 @@ export class CommandParser
                             global.stack[arg1.value] = "";
                             return;
                         case "string":
-                            global.stack[arg1.value] = arg2.value.slice(1, arg2.value.length - 1);
+                            global.stack[arg1.value] = arg2.value.includes(" ") ? arg2.value : arg2.value.slice(1, arg2.value.length - 1);
                             break;
                         case "literal":
                         case "path":
@@ -156,7 +156,7 @@ export class CommandParser
                 {
                     const arg1 = this.Literal();
                     const r = global.stack[arg1.value];
-                    global.stack[arg1.value] = undefined;
+                    Reflect.deleteProperty(global.stack, arg1.value);
                     return r;
                 }
                 case "list":
