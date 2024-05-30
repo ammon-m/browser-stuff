@@ -119,7 +119,7 @@ function init(motd)
             else if(cursorPos <= input.length - 1) cursorPos++
             drawCanvas();
         }
-        else if(event.key.match(/[\w,\.\(\)\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/g) && event.key.length == 1 && !event.ctrlKey && !event.metaKey)
+        else if(event.key.length == 1 && !event.ctrlKey && !event.metaKey)
         {
             input = stringReplaceShift(input, cursorPos, event.key)
             cursorPos++;
@@ -127,19 +127,10 @@ function init(motd)
             drawCanvas();
             event.preventDefault()
         }
-        else if(event.code == "KeyV" && event.ctrlKey && event.shiftKey)
-        {
-            pastingAll = true;
-        }
     })
 
     window.addEventListener("paste", event => {
         let str = event.clipboardData.getData("text/plain");
-
-        if(!pastingAll)
-        {
-            str = str.replaceAll(/[^\w,\.\(\)\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/g, "")
-        }
 
         input = stringReplaceShift(input, cursorPos, str)
         cursorPos += str.length
