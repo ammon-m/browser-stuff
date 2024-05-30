@@ -95,7 +95,7 @@ export class CommandParser
         echo: () => new Command("echo", [], (event) => {
             let value;
             if(this._lookAhead.type == "word" && this._lookAhead.value != "echo" && this.commands.hasOwnProperty(this._lookAhead.value))
-                value = this.Command();
+                value = this.commands[this._lookAhead.value]().execute();
             else
                 value = this.Expression();
 
@@ -188,7 +188,7 @@ export class CommandParser
      */
     parse(string)
     {
-        this.string = string
+        this.string = string.startsWith(" ") ? string.replace(/ +/, "") : string
         this.lexer = new Lexer(this.string, tokenTypes)
 
         this._lookAhead = this.lexer.nextToken();
