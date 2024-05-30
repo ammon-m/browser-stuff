@@ -102,8 +102,6 @@ export class CommandParser
             else
                 value = this.Expression();
 
-            this.End();
-
             const val = evaluate(value);
             if(value) logger.log(val);
         }),
@@ -193,10 +191,14 @@ export class CommandParser
 
         this._lookAhead = this.lexer.nextToken();
 
-        const arr = []
+        const arr = [this.Command()];
 
-        while(this._lookAhead.type != "EoL")
+        if(this._lookAhead.type != ";" && this._lookAhead.type != "EoL")
+            throw new SyntaxError("Expected end of input, got " + this._lookAhead.type);
+
+        while(this._lookAhead.type == ";")
         {
+            this.eat(";");
             switch(this._lookAhead.type)
             {
                 case "path": {
@@ -204,8 +206,6 @@ export class CommandParser
                     logger.warn("The filesystem hasn't been implemented yet");
                     break;
                 }
-                case ";":
-                    this.eat(";");
                 default:
                     arr.push(this.Command());
                     break;
@@ -287,7 +287,10 @@ try using the help command to see get help
     HelpCommandArgument()
     {
         if(this._lookAhead.type == "word") return this.Word();
-        return this.End();
+        return {
+            type: "EoL",
+            value: "",
+        };
     }
 
     String()
@@ -302,11 +305,11 @@ try using the help command to see get help
 
     End()
     {
-        if(this._lookAhead.type == "EoL")
-        {
-            const token = this.eat('EoL');
-            return token
-        }
+        const token = this.eat('EoL ;');
+        return {
+            type: "EoL",
+            value: token.value,
+        };
     }
 
     Expression()
@@ -433,7 +436,7 @@ try using the help command to see get help
         let types = tokenType.split(" ")
         let token = this._lookAhead;
 
-        if(!token || (!types.includes(token.type) && token.type == 'EoL'))
+        if(!token || (!types.includes(token.type) && (token.type == 'EoL' || token.type == ';')))
             throw new SyntaxError(`Unexpected end of input\n`)
 
         var expected = tokenType
