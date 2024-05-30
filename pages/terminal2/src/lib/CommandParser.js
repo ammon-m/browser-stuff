@@ -38,14 +38,18 @@ const commandsList =
     /** @param {CommandExecutionEvent} event */
     help: (event) => {
         const cmd = event.parameters[0]
+        let str = ""
         if(cmd.type == "EoL")
-            logger.log("List of all available commands:\n  " + (Object.keys(commandsList).join("\n  "))
+            str = ("List of all available commands:\n  " + (Object.keys(commandsList).join("\n  "))
             + "\n\nUse help <command> to learn more about a specific command\n")
         else if(!commandsList.hasOwnProperty(cmd.value))
             throw new SyntaxError(`Unknown command '${cmd.value}'\n`)
         else if(!commandsHelp.hasOwnProperty(cmd.value))
-            logger.log("[no documentation]\n")
-        else logger.log(commandsHelp[cmd.value] + "\n")
+            str = ("[no documentation]\n")
+        else str = (commandsHelp[cmd.value] + "\n")
+
+        logger.log(str);
+        return str
     },
 
     /** @param {CommandExecutionEvent} event */
@@ -89,7 +93,6 @@ export class CommandParser
     {
         help: () => new Command("help", [
             this.HelpCommandArgument(),
-            this.End(),
         ], commandsList.help),
 
         echo: () => new Command("echo", [], (event) => {
@@ -106,12 +109,10 @@ export class CommandParser
         }),
 
         clear: () => new Command("clear", [
-            this.End(),
         ], commandsList.clear),
 
         user: () => new Command("user", [
             this.String(),
-            this.End(),
         ], commandsList.user),
 
         /**@returns {Command} */
@@ -176,7 +177,6 @@ export class CommandParser
         }),
 
         motd: () => new Command("motd", [
-            this.End()
         ], (event) => {
             global.printMotd();
         })
@@ -184,7 +184,7 @@ export class CommandParser
 
     /**
      * Throws {@linkcode SyntaxError} if the command fails at any point.
-     * @returns {Command}
+     * @returns {Command[]}
      */
     parse(string)
     {
@@ -193,16 +193,26 @@ export class CommandParser
 
         this._lookAhead = this.lexer.nextToken();
 
-        switch(this._lookAhead.type)
+        const arr = []
+
+        while(this._lookAhead.type != "EoL")
         {
-            case "path": {
-                const token = this.eat("path");
-                logger.warn("The filesystem hasn't been implemented yet");
-                return null;
+            switch(this._lookAhead.type)
+            {
+                case "path": {
+                    const token = this.eat("path");
+                    logger.warn("The filesystem hasn't been implemented yet");
+                    break;
+                }
+                case ";":
+                    this.eat(";");
+                default:
+                    arr.push(this.Command());
+                    break;
             }
-            default:
-                return this.Command();
         }
+        this.eat("EoL");
+        return arr;
     }
 
     /**
@@ -292,20 +302,11 @@ try using the help command to see get help
 
     End()
     {
-        switch(this._lookAhead.type)
+        if(this._lookAhead.type == "EoL")
         {
-            case "EoL": {
-                const token = this.eat('EoL');
-                return {
-                    type: "EoL",
-                    value: token.value
-                };
-            }
-            case ";":
-                this.eat(';');
-                return this.Command();
+            const token = this.eat('EoL');
+            return token
         }
-        throw new SyntaxError("Expected end of input, got: " + this._lookAhead.value);
     }
 
     Expression()

@@ -195,11 +195,11 @@ function receiveUserCommand(value)
     cursorPos = 0
 
     const parser = new CommandParser()
-    let command = null
+    let commands = null
 
     try
     {
-        command = parser.parse(value)
+        commands = parser.parse(value)
     }
     catch(error)
     {
@@ -209,11 +209,12 @@ function receiveUserCommand(value)
         console.error(error)
         return;
     }
-    if(command == null) return;
+    if(commands == null) return;
 
     try
     {
-        command.execute()
+        for(const command of commands)
+            command.execute()
     }
     catch(error)
     {
