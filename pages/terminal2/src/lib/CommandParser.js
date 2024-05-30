@@ -268,8 +268,8 @@ try using the help command to see get help
 
     HelpCommandArgument()
     {
-        const token = this.eat('word EoL')
-        return token
+        if(this._lookAhead.type == "word") return this.Word();
+        return this.End();
     }
 
     String()
