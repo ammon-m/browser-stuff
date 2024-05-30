@@ -166,8 +166,6 @@ function receiveUserCommand(value)
 {
     if(!value) return;
 
-    commandHistoryPos = commandHistory.length
-
     if(global.echo)
     {
         terminal.SetColor(global.theme.user)
@@ -184,6 +182,8 @@ function receiveUserCommand(value)
 
         terminal.Write(value)
     }
+
+    commandHistoryPos = commandHistory.length
 
     if(value == "") return;
 

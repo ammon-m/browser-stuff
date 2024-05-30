@@ -301,8 +301,8 @@ try using the help command to see get help
                     value: token.value
                 };
             }
-            case "|":
-                this.eat('|');
+            case ";":
+                this.eat(';');
                 return this.Command();
         }
         throw new SyntaxError("Expected end of input, got: " + this._lookAhead.value);
@@ -415,7 +415,7 @@ try using the help command to see get help
         while(this._lookAhead.type != "]")
         {
             arr.value.push(this.Expression());
-            this.eat(",");
+            if(this._lookAhead.type != "]") this.eat(",");
         }
 
         this.eat("]")
@@ -492,14 +492,16 @@ const tokenTypes = Object.freeze({
     "[": /^\[/,
     "]": /^\]/,
     "=": /^=/,
+    ";": /^;/,
+    ":": /^:/,
     ",": /^\,/,
     ".": /^\./,
     "?": /^\?/,
     "$": /^\$/,
     "|": /^\|/,
-    path: /^([^\/\t]+(\/[^\/\t]+)*(\.[a-zA-Z0-9]+|\/))/,
     additiveOperator: /^(\+|-)/,
     multiplicativeOperator: /^(\*|\/)/,
+    path: /^([^\/\t]+(\/[^\/\t]+)*(\.[a-zA-Z0-9]+|\/))/,
     number: /^(\d+(?:\.\d+)?)/,
     string: /^"(\\"|.)*"/,
     word: /^[a-zA-Z_][a-zA-Z_0-9]*/,
