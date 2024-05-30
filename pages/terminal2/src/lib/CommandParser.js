@@ -52,11 +52,7 @@ const commandsList =
         return str
     },
 
-    /** @param {CommandExecutionEvent} event */
-    echo: (event) => {
-        const value = evaluate(event.parameters[0]);
-        logger.log(value);
-    },
+    echo: (event) => {},
 
     /** @param {CommandExecutionEvent} event */
     clear: (event) => {
@@ -95,19 +91,16 @@ export class CommandParser
             this.HelpCommandArgument(),
         ], commandsList.help),
 
-        echo: () => new Command("echo", [], (event) => {
-            let value;
-            if(this._lookAhead.type == "word" && this._lookAhead.value != "echo" && this.commands.hasOwnProperty(this._lookAhead.value))
-                value = this.Command().execute();
-            else
-                value = this.Expression();
+        echo: () => new Command("echo", [
+            this.Expression()
+        ], (event) => {
+            const val = evaluate(event.parameters[0]);
+            logger.log(val);
 
-            const val = evaluate(value);
-            if(value) logger.log(val);
+            return val;
         }),
 
-        clear: () => new Command("clear", [
-        ], commandsList.clear),
+        clear: () => new Command("clear", [], commandsList.clear),
 
         user: () => new Command("user", [
             this.String(),
@@ -174,8 +167,7 @@ export class CommandParser
             throw new SyntaxError("First argument must be one of: set, get, list, or flush\n");
         }),
 
-        motd: () => new Command("motd", [
-        ], (event) => {
+        motd: () => new Command("motd", [], (event) => {
             global.printMotd();
         })
     }
@@ -317,6 +309,13 @@ try using the help command to see get help
         return this.AdditiveExpression();
     }
 
+    Equatable()
+    {
+        if(this._lookAhead.type == "word" && this.commands.hasOwnProperty(this._lookAhead.value))
+            return this.Command();
+        return this.Literal();
+    }
+
     Literal()
     {
         switch(this._lookAhead.type)
@@ -343,7 +342,7 @@ try using the help command to see get help
         switch(this._lookAhead.type)
         {
             case "(": return this.ParenthesizedExpression();
-            default: return this.Literal();
+            default: return this.Equatable();
         }
     }
 
@@ -470,6 +469,8 @@ function evaluate(expression)
                 case "*": return evaluate(expression.left) * evaluate(expression.right);
                 case "/": return evaluate(expression.left) / evaluate(expression.right);
             }
+        case "command":
+            return expression.execute();
         case "number":
             return Number(expression.value);
         case "variable":
@@ -481,8 +482,6 @@ function evaluate(expression)
                 arr.push(evaluate(expression.value[i]));
             }
             return arr;
-        case "command":
-            return expression.execute();
         default:
             return expression.value;
     }
