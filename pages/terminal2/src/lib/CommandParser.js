@@ -193,9 +193,6 @@ export class CommandParser
 
         const arr = [this.Command()];
 
-        if(this._lookAhead.type != ";" && this._lookAhead.type != "EoL")
-            throw new SyntaxError("Expected end of input, got " + this._lookAhead.type);
-
         while(this._lookAhead.type == ";")
         {
             this.eat(";");
@@ -211,7 +208,7 @@ export class CommandParser
                     break;
             }
         }
-        this.eat("EoL");
+        this.End();
         return arr;
     }
 
