@@ -17,11 +17,14 @@ globalThis.global = {
     stack: new VariableManager(),
 
     printMotd: () => {
+        let e = global.echo;
+        global.echo = false;
         terminal.WriteLine("Welcome to ");
         terminal.SetBold(true);
         terminal.Write("Conch");
         terminal.SetBold(false);
         terminal.Write(` [v${VERSION}]\nAn experimental browser-based shell\n`);
+        global.echo = e;
     }
 }
 
