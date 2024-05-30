@@ -93,11 +93,11 @@ export class CommandParser
         echo: () => new Command("echo", [], (event) => {
             let value;
             if(this._lookAhead.type == "word" && this._lookAhead.value != "echo" && this.commands.hasOwnProperty(this._lookAhead.value))
-                value = this.Command().execute();
+                value = this.Command();
             else
-                value = evaluate(this.Expression());
+                value = this.Expression();
 
-            if(value) logger.log(value);
+            if(value) logger.log(evaluate(value));
 
             this.End();
         }),
