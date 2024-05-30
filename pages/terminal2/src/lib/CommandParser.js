@@ -70,6 +70,7 @@ const commandsList =
     },
 
     stack: (event) => {},
+    motd: (event) => {},
 }
 
 const commandsHelp =
@@ -177,12 +178,7 @@ export class CommandParser
         motd: () => new Command("motd", [
             this.End()
         ], (event) => {
-            terminal.WriteLine("Welcome to ");
-            terminal.SetBold(true);
-            terminal.Write("Conch");
-            terminal.SetBold(false);
-            terminal.Write(` [v${VERSION}]\nAn experimental browser-based shell\n`);
-            terminal.WriteLine("");
+            global.printMotd();
         })
     }
 

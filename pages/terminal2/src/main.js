@@ -15,6 +15,14 @@ globalThis.global = {
     echo: true,
     theme: Object.freeze(ThemeColorSet.Default),
     stack: new VariableManager(),
+
+    printMotd: () => {
+        terminal.WriteLine("Welcome to ");
+        terminal.SetBold(true);
+        terminal.Write("Conch");
+        terminal.SetBold(false);
+        terminal.Write(` [v${VERSION}]\nAn experimental browser-based shell\n`);
+    }
 }
 
 /**
