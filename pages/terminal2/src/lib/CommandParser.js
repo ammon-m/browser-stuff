@@ -1,20 +1,3 @@
-const tokenTypes = Object.freeze({
-    opCurly: /\{/,
-    clCurly: /\}/,
-    opSquare: /\[/,
-    clSquare: /\]/,
-    comma: /\,/,
-    dot: /\./,
-    number: /\d+(?:\.\d+)?/,
-    string: /"(\\"|.)*"/,
-    path: /[^\/\t]+(\/[^\/\t]+)*(\.[a-zA-Z0-9]+|\/)/,
-    literal: /[a-zA-Z_][a-zA-Z_0-9]*/,
-    boolean: /true|false/,
-    question: /\?/,
-    dollar: /\$/,
-    EoL: /\s*$/,
-})
-
 class CommandExecutionEvent
 {
     /**@type {Token[]} */
@@ -38,7 +21,7 @@ class Command
      */
     constructor(name, parameters, callback = () => {})
     {
-        this.type = "Command"
+        this.type = "command"
         this.name = name
         this.parameters = parameters
         this.callback = callback
@@ -67,9 +50,8 @@ const commandsList =
 
     /** @param {CommandExecutionEvent} event */
     echo: (event) => {
-        if(event.parameters[0].value == "")
-            throw new SyntaxError("First argument of echo cannot be empty\n")
-        else logger.log(event.parameters[0].value)
+        const value = evaluate(event.parameters[0]);
+        logger.log(value);
     },
 
     /** @param {CommandExecutionEvent} event */
@@ -108,10 +90,17 @@ export class CommandParser
             this.End(),
         ], commandsList.help),
 
-        echo: () => new Command("echo", [
-            this.String(),
-            this.End(),
-        ], commandsList.echo),
+        echo: () => new Command("echo", [], (event) => {
+            let value;
+            if(this._lookAhead.type == "word" && this._lookAhead.value != "echo" && this.commands.hasOwnProperty(this._lookAhead.value))
+                value = this.Command().execute();
+            else
+                value = evaluate(this.Expression());
+
+            if(value) logger.log(value);
+
+            this.End();
+        }),
 
         clear: () => new Command("clear", [
             this.End(),
@@ -124,48 +113,31 @@ export class CommandParser
 
         /**@returns {Command} */
         stack: () => new Command("stack", [
-            this.Literal(),
+            this.Word(),
         ], (event) => {
             switch(event.parameters[0].value)
             {
-                case "push":
+                case "set":
                 {
-                    const arg1 = this.Literal();
-                    const arg2 = this.lexer.peekToken();
-                    switch(arg2.type)
-                    {
-                        case "opCurly":
-                        case "clCurly":
-                        case "opSquare":
-                        case "clSquare":
-                            throw new SyntaxError("support for expressions not yet implemented\n");
-                        case "EoL":
-                            global.stack[arg1.value] = "";
-                            return;
-                        case "string":
-                            global.stack[arg1.value] = arg2.value.includes(" ") ? arg2.value : arg2.value.slice(1, arg2.value.length - 1);
-                            break;
-                        case "literal":
-                        case "path":
-                        default:
-                            global.stack[arg1.value] = arg2.value;
-                            break;
-                    }
+                    const arg1 = this.Word();
+                    const arg2 = this.Expression();
+                    global.stack.Set(arg1.value, evaluate(arg2));
                     return;
                 }
-                case "pop":
+                case "get":
                 {
-                    const arg1 = this.Literal();
-                    const r = global.stack[arg1.value];
-                    Reflect.deleteProperty(global.stack, arg1.value);
-                    return r;
+                    const arg1 = this.Word();
+                    return {
+                        type: "variable",
+                        value: arg1.value,
+                    }
                 }
                 case "list":
                 {
-                    let label = "\nname";
+                    let label = "name";
                     let longest = 16;
 
-                    for(const key of Object.keys(global.stack))
+                    for(const key of Object.keys(global.stack._keyvalues))
                     {
                         if(longest < key.length + 4)
                             longest = key.length + 4;
@@ -177,26 +149,27 @@ export class CommandParser
 
                     logger.log(label);
 
-                    for(const key of Object.keys(global.stack))
+                    for(const key of Object.keys(global.stack._keyvalues))
                     {
                         let str = "- " + key;
                         for(var i = 0; i < longest - key.length; i++)
                             str += " ";
-                        str += global.stack[key].toString();
+                        str += global.stack.Get(key).toString();
 
                         logger.log(str);
                     }
 
                     logger.log("");
+
                     return;
                 }
                 case "flush":
                 {
-                    global.stack = {}
+                    global.stack.Clear();
                     return;
                 }
             }
-            throw new SyntaxError("First argument must be one of: push, pop, list, or flush\n");
+            throw new SyntaxError("First argument must be one of: set, get, list, or flush\n");
         }),
     }
 
@@ -209,46 +182,96 @@ export class CommandParser
         this.string = string
         this.lexer = new Lexer(this.string, tokenTypes)
 
-        return this.Command()
-    }
+        this._lookAhead = this.lexer.nextToken();
 
-    Command()
-    {
-        let name = this.eat('*')
-
-        if(this.commands.hasOwnProperty(name.value)) return this.commands[name.value]();
-
-        throw new SyntaxError(`Unknown command '${name.value}'\n`)
-    }
-
-    Literal()
-    {
-        const token = this.eat('literal')
-        return {
-            type: "literal",
-            value: token.value
+        switch(this._lookAhead.type)
+        {
+            case "path": {
+                const token = this.eat("path");
+                logger.warn("The filesystem hasn't been implemented yet");
+                return null;
+            }
+            default:
+                return this.Command();
         }
     }
 
-    Question()
+    /**
+     * @returns {Command}
+     */
+    Command()
     {
-        const token = this.eat('question')
+        switch(this._lookAhead.type)
+        {
+            case "word": {
+                let name = this.Word();
+                if(this.commands.hasOwnProperty(name.value)) return this.commands[name.value]();
+
+                switch(this._lookAhead.type)
+                {
+                    case "=": {
+                        this.eat("=");
+                        const value = this.Expression();
+
+                        return new Command("", [],
+                            () => {
+                                global.stack.Set(name.value, evaluate(value));
+                                return value;
+                            },
+                        );
+                    }
+                    case "additiveOperator":
+                    case "multiplicativeOperator": {
+                        const token = this.eat(this._lookAhead.type);
+                        this.eat("=");
+                        const value = {
+                            type: "BinaryExpression",
+                            operator: token.value,
+                            left: {
+                                type: "variable",
+                                value: name.value,
+                            },
+                            right: this.Expression(),
+                        };
+
+                        return new Command("", [],
+                            () => {
+                                global.stack.Set(name.value, evaluate(value));
+                                return value;
+                            },
+                        );
+                    }
+                    default:
+                        throw new SyntaxError(`Unknown command: ${name.value}\ntry using the help command to see get help\n`);
+                }
+            }
+        }
+
+        throw new SyntaxError(
+`Unknown command: ${this.string.split(" ")[0]}
+try using the help command to see get help
+`)
+    }
+
+    Word()
+    {
+        const token = this.eat('word')
         return {
-            type: "operator",
+            type: "word",
             value: token.value
         }
     }
 
     HelpCommandArgument()
     {
-        const token = this.eat('literal EoL')
+        const token = this.eat('word EoL')
         return token
     }
 
     String()
     {
-        const token = this.eat('string literal')
-        const string = token.value.startsWith('"') || token.value.startsWith("'")
+        const token = this.eat('string word')
+        const string = token.value.startsWith('"')
         return {
             type: "string",
             value: string ? token.value.slice(1, token.value.length - 1) : token.value // remove quotes
@@ -257,19 +280,131 @@ export class CommandParser
 
     End()
     {
-        const token = this.eat('EoL')
-        return {
-            type: "EoL",
-            value: token.value
+        switch(this._lookAhead.type)
+        {
+            case "EoL": {
+                const token = this.eat('EoL');
+                return {
+                    type: "EoL",
+                    value: token.value
+                };
+            }
+            case "|":
+                this.eat('|');
+                return this.Command();
         }
     }
 
-    /**
-     * @returns {Token}
-     */
-    lookAhead()
+    Expression()
     {
-        return this.lexer.nextToken()
+        return this.AdditiveExpression();
+    }
+
+    Literal()
+    {
+        switch(this._lookAhead.type)
+        {
+            case "word": return this.Word();
+            case "string": return this.String();
+            case "number": return this.Number();
+            case "$": return this.Variable();
+        }
+    }
+
+    Number()
+    {
+        const token = this.eat("number");
+        return {
+            type: token.type,
+            value: Number(token.value),
+        };
+    }
+
+    PrimaryExpression()
+    {
+        switch(this._lookAhead.type)
+        {
+            case "(": return this.ParenthesizedExpression();
+            default: return this.Literal();
+        }
+    }
+
+    ParenthesizedExpression()
+    {
+        this.eat("(");
+        const expression = this.Expression();
+        this.eat(")");
+        return expression;
+    }
+
+    AdditiveExpression()
+    {
+        return this._BinaryExpression("MultiplicativeExpression", "additiveOperator");
+    }
+
+    MultiplicativeExpression()
+    {
+        return this._BinaryExpression("PrimaryExpression", "multiplicativeOperator");
+    }
+
+    _BinaryExpression(name, type)
+    {
+        let left = this[name]();
+
+        while(this._lookAhead.type == type)
+        {
+            const operator = this.eat(type).value;
+
+            const right = this[name]();
+
+            left = {
+                type: "BinaryExpession",
+                operator,
+                left,
+                right,
+            };
+        }
+
+        return left;
+    }
+
+    Variable()
+    {
+        this.eat("$");
+        let token = null;
+        switch(this._lookAhead.type)
+        {
+            case "number":
+                token = this.eat("number");
+                break;
+            case "word":
+                token = this.eat("word");
+                break;
+        }
+        return {
+            type: "variable",
+            value: token.value,
+        };
+    }
+
+    Array()
+    {
+        this.eat("[");
+
+        const arr = {
+            type: "array",
+            value: [],
+        };
+
+        while(this._lookAhead.type != "]")
+        {
+            arr.value.push(this.Expression());
+            this.eat(",");
+        }
+
+        this.eat("]")
+
+        return type
     }
 
     /**
@@ -279,21 +414,82 @@ export class CommandParser
     eat(tokenType)
     {
         let types = tokenType.split(" ")
-        let token = this.lookAhead()
+        let token = this._lookAhead;
 
         if(!token || (!types.includes(token.type) && token.type == 'EoL'))
             throw new SyntaxError(`Unexpected end of input\n`)
-
-        if(types.includes(token.type) || tokenType == "*")
-            return token
 
         var expected = tokenType
         if(types.length > 1)
             expected = types.join(" | ")
 
-        throw new SyntaxError(`Unexpected symbol \`${token.value}\`, expected ${expected} at position ${this.lexer.pos.index - 1}\n`)
+        if(!types.includes(token.type) && tokenType != "*")
+            throw new SyntaxError(`Unexpected ${token.type} \`${token.value}\`, expected ${expected}, at position ${this.lexer.pos.index - 1}\n`)
+
+        this._lookAhead = this.lexer.nextToken();
+
+        return token
     }
 }
+
+/**@typedef {{type: string, operator: string, left: BinaryExpression | Token, right: BinaryExpression | Token}} BinaryExpression */
+/**@typedef {Token | BinaryExpression | Command} BinaryExpressionHead */
+
+/**
+ * @param {BinaryExpressionHead} expression
+ */
+function evaluate(expression)
+{
+    switch(expression.type)
+    {
+        case "BinaryExpression":
+            switch(expression.operator)
+            {
+                case "+": return evaluate(expression.left) + evaluate(expression.right);
+                case "-": return evaluate(expression.left) - evaluate(expression.right);
+                case "*": return evaluate(expression.left) * evaluate(expression.right);
+                case "/": return evaluate(expression.left) / evaluate(expression.right);
+            }
+        case "number":
+            return Number(expression.value);
+        case "variable":
+            return global.stack.Get(expression.value);
+        case "array":
+            const arr = [];
+            for(var i = 0; i < expression.value.length; i++)
+            {
+                arr.push(evaluate(expression.value[i]));
+            }
+            return arr;
+        case "command":
+            return expression.execute();
+        default:
+            return expression.value;
+    }
+}
+
+const tokenTypes = Object.freeze({
+    "(": /^\(/,
+    ")": /^\)/,
+    "{": /^\{/,
+    "}": /^\}/,
+    "[": /^\[/,
+    "]": /^\]/,
+    "=": /^=/,
+    ",": /^\,/,
+    ".": /^\./,
+    "?": /^\?/,
+    "$": /^\$/,
+    "|": /^\|/,
+    path: /^([^\/\t]+(\/[^\/\t]+)*(\.[a-zA-Z0-9]+|\/))/,
+    additiveOperator: /^(\+|-)/,
+    multiplicativeOperator: /^(\*|\/)/,
+    number: /^(\d+(?:\.\d+)?)/,
+    string: /^"(\\"|.)*"/,
+    word: /^[a-zA-Z_][a-zA-Z_0-9]*/,
+    boolean: /^(true|false)/,
+    EoL: /^\s*$/,
+})
 
 class Lexer
 {
@@ -331,7 +527,7 @@ class Lexer
 
         for (let _type in this.types) {
             const e = this.types[_type].exec(this.slice) // REGEXXXXXX
-            if (e === null || e.index != 0)
+            if (e === null)
                 continue;
 
             token = new Token(_type, e[0]);

@@ -2,6 +2,7 @@ import Terminal from "./lib/CanvasRenderer.js";
 import { CommandParser } from "./lib/CommandParser.js"
 import Logger from "./lib/Logger.js"
 import ThemeColorSet from "./lib/ThemeColorSet.js"
+import VariableManager from "./lib/VariableManager.js";
 import * as minifs from "./lib/minifs.js"
 
 'use strict';
@@ -11,9 +12,9 @@ globalThis.global = {
     device: "vm",
     cwd: "~",
     canType: true,
+    echo: true,
     theme: Object.freeze(ThemeColorSet.Default),
-
-    stack: {},
+    stack: new VariableManager(),
 }
 
 /**
@@ -118,7 +119,7 @@ function init(motd)
             else if(cursorPos <= input.length - 1) cursorPos++
             drawCanvas();
         }
-        else if(event.key.match(/[\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/) && event.key.length == 1 && !event.ctrlKey && !event.metaKey)
+        else if(event.key.match(/[\w,\.\(\)\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/g) && event.key.length == 1 && !event.ctrlKey && !event.metaKey)
         {
             input = stringReplaceShift(input, cursorPos, event.key)
             cursorPos++;
@@ -137,7 +138,7 @@ function init(motd)
 
         if(!pastingAll)
         {
-            str = str.replaceAll(/[^\w,\.\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/g, "")
+            str = str.replaceAll(/[^\w,\.\(\)\{\}\[\]\|=\-_!~\^\*@\"'`#\$%&\/\\ ]/g, "")
         }
 
         input = stringReplaceShift(input, cursorPos, str)
@@ -167,7 +168,6 @@ function receiveUserCommand(value)
 {
     if(!value) return;
 
-    commandHistory.push(value)
     commandHistoryPos = commandHistory.length
 
     terminal.SetColor(global.theme.user)
@@ -185,6 +185,9 @@ function receiveUserCommand(value)
     terminal.Write(value)
 
     if(value == "") return;
+
+    commandHistory.push(value)
+    commandHistoryPos = commandHistory.length
 
     console.log("[Conch] " + value)
 
@@ -329,7 +332,7 @@ function drawCanvas()
     const totalLines = terminal._rawText.split("\n").length;
 
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, (Math.max(0, terminal._scroll - totalLines + 1) / (totalLines + 2)) * cursorCtx.canvas.height, charWidth, ((maxRows + 3/lineHeight) / (totalLines + 2) + 3/lineHeight) * cursorCtx.canvas.height)
+    cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, (terminal._scroll / (totalLines + 2)) * cursorCtx.canvas.height, charWidth, ((maxRows + 3/lineHeight) / (totalLines + 2) + 3/lineHeight) * cursorCtx.canvas.height)
 }
 
 init("hello world")
