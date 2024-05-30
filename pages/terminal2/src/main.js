@@ -78,6 +78,8 @@ function init(motd)
         console.log(motd)
     }
 
+    receiveUserCommand("motd")
+
     window.addEventListener("keydown", event => {
         if(!global.canType) return;
 
