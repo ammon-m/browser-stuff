@@ -67,12 +67,6 @@ function init(motd)
         console.log(motd)
     }
 
-    terminal.WriteLine("Welcome to ")
-    terminal.SetBold(true)
-    terminal.Write("Conch")
-    terminal.SetBold(false)
-    terminal.Write(` [v${VERSION}]\nAn experimental browser-based shell\n`)
-
     window.addEventListener("keydown", event => {
         if(!global.canType) return;
 
@@ -161,19 +155,22 @@ function receiveUserCommand(value)
 
     commandHistoryPos = commandHistory.length
 
-    terminal.SetColor(global.theme.user)
-    terminal.WriteLine(global.user + "@" + global.device)
+    if(global.echo)
+    {
+        terminal.SetColor(global.theme.user)
+        terminal.WriteLine(global.user + "@" + global.device)
 
-    terminal.SetColor(global.theme.foreground)
-    terminal.Write(":")
+        terminal.SetColor(global.theme.foreground)
+        terminal.Write(":")
 
-    terminal.SetColor(global.theme.path)
-    terminal.Write(global.cwd)
+        terminal.SetColor(global.theme.path)
+        terminal.Write(global.cwd)
 
-    terminal.SetColor(global.theme.foreground)
-    terminal.Write("$ ")
+        terminal.SetColor(global.theme.foreground)
+        terminal.Write("$ ")
 
-    terminal.Write(value)
+        terminal.Write(value)
+    }
 
     if(value == "") return;
 
@@ -252,15 +249,16 @@ const maxRows = Math.floor(textCtx.canvas.height / lineHeight)
 
 const xPadding = 2;
 
-const terminal = new Terminal(textCtx)
-terminal.SetCharWidth(charWidth)
-terminal.SetLineHeight(lineHeight)
-terminal.SetMaxColumns(maxColumns)
-terminal.SetMaxRows(maxRows)
-terminal.SetXPadding(xPadding)
+const terminal = new Terminal(textCtx);
+terminal.SetCharWidth(charWidth);
+terminal.SetLineHeight(lineHeight);
+terminal.SetMaxColumns(maxColumns);
+terminal.SetMaxRows(maxRows);
+terminal.SetXPadding(xPadding);
 terminal.onRedraw = () => {
     drawCanvas()
-}
+};
+globalThis.terminal = terminal;
 
 function renderOutput(entries)
 {

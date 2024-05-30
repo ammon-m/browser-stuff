@@ -79,6 +79,7 @@ const commandsHelp =
     clear: "clears the log",
     user: "prints the string as raw html to the log",
     stack: "provides basic functionality that allows the user to read and write to the variable stack",
+    motd: "print the motd",
 }
 
 export class CommandParser
@@ -172,6 +173,17 @@ export class CommandParser
             }
             throw new SyntaxError("First argument must be one of: set, get, list, or flush\n");
         }),
+
+        motd: () => new Command("motd", [
+            this.End()
+        ], (event) => {
+            terminal.WriteLine("Welcome to ");
+            terminal.SetBold(true);
+            terminal.Write("Conch");
+            terminal.SetBold(false);
+            terminal.Write(` [v${VERSION}]\nAn experimental browser-based shell\n`);
+            terminal.WriteLine("");
+        })
     }
 
     /**
