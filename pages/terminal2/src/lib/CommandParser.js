@@ -296,6 +296,7 @@ try using the help command to see get help
                 this.eat('|');
                 return this.Command();
         }
+        throw new SyntaxError("Expected end of input, got: " + this._lookAhead.value);
     }
 
     Expression()
@@ -307,11 +308,12 @@ try using the help command to see get help
     {
         switch(this._lookAhead.type)
         {
-            case "word": return this.Word();
-            case "string": return this.String();
-            case "number": return this.Number();
             case "$": return this.Variable();
+            case "number": return this.Number();
+            case "string": return this.String();
+            case "word": return this.Word();
         }
+        throw new SyntaxError(`Unexpected ${this._lookAhead.type} \`${this._lookAhead.value}\`, expected variable, string, or word\n`);
     }
 
     Number()
@@ -383,6 +385,8 @@ try using the help command to see get help
             case "word":
                 token = this.eat("word");
                 break;
+            default:
+                throw new SyntaxError(`Unexpected ${this._lookAhead.type} \`${this._lookAhead.value}\`, expected word\n`);
         }
         return {
             type: "variable",
