@@ -211,7 +211,10 @@ export class CommandParser
                 {
                     case "=": {
                         this.eat("=");
-                        const value = this.Expression();
+                        const value = this._lookAhead.type == "EoL" ? {
+                            type: "string",
+                            value: ""
+                        } : this.Expression();
 
                         return new Command("", [],
                             () => {

@@ -12,7 +12,7 @@ export default class VariableManager
 
     Set(key, value)
     {
-        if(value)
+        if(value && value != "")
             this._keyvalues[key] = value;
         else
             Reflect.deleteProperty(this._keyvalues, key);
