@@ -98,7 +98,7 @@ export class CommandParser
         echo: () => new Command("echo", [], (event) => {
             let value;
             if(this._lookAhead.type == "word" && this._lookAhead.value != "echo" && this.commands.hasOwnProperty(this._lookAhead.value))
-                value = this.commands[this._lookAhead.value]().execute();
+                value = this.Command().execute();
             else
                 value = this.Expression();
 
@@ -193,6 +193,9 @@ export class CommandParser
 
         const arr = [this.Command()];
 
+        if(this._lookAhead.type != ";" && this._lookAhead.type != "EoL")
+            throw new SyntaxError("Expected end of input, got " + this._lookAhead.type);
+
         while(this._lookAhead.type == ";")
         {
             this.eat(";");
@@ -208,7 +211,7 @@ export class CommandParser
                     break;
             }
         }
-        this.End();
+        this.eat("EoL");
         return arr;
     }
 
