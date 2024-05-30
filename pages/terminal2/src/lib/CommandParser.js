@@ -97,9 +97,10 @@ export class CommandParser
             else
                 value = this.Expression();
 
-            if(value) logger.log(evaluate(value));
-
             this.End();
+
+            const val = evaluate(value);
+            if(value) logger.log(val);
         }),
 
         clear: () => new Command("clear", [
@@ -363,7 +364,7 @@ try using the help command to see get help
             const right = this[name]();
 
             left = {
-                type: "BinaryExpession",
+                type: "BinaryExpression",
                 operator,
                 left,
                 right,
