@@ -12,7 +12,7 @@ export default class VariableManager
 
     Set(key, value)
     {
-        if(value && value != "")
+        if(value != "")
             this._keyvalues[key] = value;
         else
             Reflect.deleteProperty(this._keyvalues, key);
@@ -21,7 +21,7 @@ export default class VariableManager
     Get(key)
     {
         const val = this._keyvalues[key];
-        return val ? val : "";
+        return val != undefined ? val : "";
     }
 
     Clear()
