@@ -156,7 +156,7 @@ export class CommandParser
 
                     logger.log("");
 
-                    return;
+                    return str;
                 }
                 case "flush":
                 {
