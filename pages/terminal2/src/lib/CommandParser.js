@@ -235,8 +235,31 @@ export class CommandParser
                         );
                     }
                     case "additiveOperator":
-                    case "multiplicativeOperator": {
                         const token = this.eat(this._lookAhead.type);
+                        if(this._lookAhead.type == "additiveOperator" && this._lookAhead.value == token.value)
+                        {
+                            this.eat(token.type);
+                            const value = {
+                                type: "BinaryExpression",
+                                operator: token.value,
+                                left: {
+                                    type: "variable",
+                                    value: name.value,
+                                },
+                                right: {
+                                    type: "number",
+                                    value: 1
+                                },
+                            };
+    
+                            return new Command("", [],
+                                () => {
+                                    global.stack.Set(name.value, evaluate(value));
+                                    return value;
+                                },
+                            );
+                        }
+                    case "multiplicativeOperator": {
                         this.eat("=");
                         const value = {
                             type: "BinaryExpression",
