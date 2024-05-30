@@ -203,7 +203,7 @@ export class CommandParser
                     break;
             }
         }
-        this.eat("EoL");
+        this.End();
         return arr;
     }
 
