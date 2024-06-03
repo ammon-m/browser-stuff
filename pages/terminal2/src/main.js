@@ -48,19 +48,21 @@ const output = {
 
 let input = ""
 let cursorPos = 0
-let cursorBlink = false;
 
-let cursorBlinkTicker = setInterval(BlinkCursor, 500);
+let cursorBlink = false;
+let cursorBlinkTicker = -1;
+
 function BlinkCursor()
 {
     cursorBlink = !cursorBlink;
     drawCanvas();
 }
+
 function ResetCursorBlink()
 {
-    cursorBlink = false;
-    clearInterval(cursorBlinkTicker);
-    cursorBlinkTicker = setInterval(BlinkCursor, 500);
+    // cursorBlink = false;
+    // clearInterval(cursorBlinkTicker);
+    // cursorBlinkTicker = setInterval(BlinkCursor, 500);
 }
 
 let pastingAll = false;
