@@ -278,7 +278,8 @@ function receiveUserCommand(value)
     }
 
     let y = terminal.GetEndPosition().y
-    terminal.ScrollTo(y + 3/lineHeight - maxRows)
+    if(y - maxRows > maxRows)
+        terminal.ScrollTo(y + 3/lineHeight - maxRows)
 }
 
 /**@type {string[]}*/
@@ -403,7 +404,7 @@ function drawCanvas()
         cursorCtx.canvas.width - charWidth,
         (Math.floor(terminal._scroll) / (totalLines + maxRows)) * cursorCtx.canvas.height,
         charWidth,
-        (maxRows / (totalLines + maxRows - 3/lineHeight)) * cursorCtx.canvas.height
+        (maxRows / (totalLines + maxRows)) * cursorCtx.canvas.height
     )
 }
 
