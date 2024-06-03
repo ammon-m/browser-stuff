@@ -190,13 +190,18 @@ function init(motd)
         terminal.Scroll(val);
     });
 
-    document.body.addEventListener("focus", event => {
-        consoleFocused = false;
-        drawCanvas();
+    let unfocusable = false;
+
+    mainElement.addEventListener("mouseleave", event => {
+        unfocusable = true;
+    });
+
+    mainElement.addEventListener("mouseenter", event => {
+        unfocusable = false;
     });
 
     mainElement.addEventListener("mousedown", event => {
-        consoleFocused = true;
+        consoleFocused = !unfocusable;
         drawCanvas();
         event.preventDefault();
     });
