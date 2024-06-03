@@ -54,6 +54,7 @@ let cursorBlinkTicker = setInterval(BlinkCursor, 500);
 function BlinkCursor()
 {
     cursorBlink = !cursorBlink;
+    drawCanvas();
 }
 function ResetCursorBlink()
 {
