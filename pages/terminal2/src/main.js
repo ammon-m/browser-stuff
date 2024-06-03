@@ -203,7 +203,7 @@ function init(motd)
     window.addEventListener("mousedown", event => {
         if((consoleFocused && unfocusable) || (!consoleFocused && !unfocusable))
         {
-            consoleFocused = false;
+            consoleFocused = !unfocusable;
             drawCanvas();
             event.preventDefault();
         }
