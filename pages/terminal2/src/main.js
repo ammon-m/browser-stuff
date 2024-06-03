@@ -261,7 +261,14 @@ function receiveUserCommand(value)
         console.error(error)
         return;
     }
-    if(commands == null) return;
+    if(commands == null)
+    {
+        let y = terminal.GetEndPosition().y
+        if(y - terminal._scroll > maxRows)
+            terminal.ScrollTo(y + 3/lineHeight - maxRows)
+
+        return;
+    }
 
     try
     {
