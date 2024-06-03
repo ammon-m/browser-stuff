@@ -2,7 +2,7 @@ import Terminal from "./lib/CanvasRenderer.js";
 import { CommandParser } from "./lib/CommandParser.js"
 import Logger from "./lib/Logger.js"
 import ThemeColorSet from "./lib/ThemeColorSet.js"
-import VariableManager from "./lib/VariableManager.js";
+import Dictionary from "./lib/VariableManager.js";
 import * as minifs from "./lib/minifs.js"
 
 'use strict';
@@ -14,7 +14,7 @@ globalThis.global = {
     canType: true,
     echo: true,
     theme: Object.freeze(ThemeColorSet.Default),
-    stack: new VariableManager(),
+    stack: new Dictionary(),
 
     printMotd: () => {
         terminal.WriteLine("Welcome to ");
