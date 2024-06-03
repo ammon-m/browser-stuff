@@ -399,7 +399,7 @@ function drawCanvas()
     const totalLines = terminal._rawText.split("\n").length;
 
     cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, (terminal._scroll / (totalLines + 2)) * cursorCtx.canvas.height, charWidth, ((maxRows + 3/lineHeight) / (totalLines + 2) + 3/lineHeight) * cursorCtx.canvas.height)
+    cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, (terminal._scroll / (totalLines + 2)) * cursorCtx.canvas.height, charWidth, ((maxRows + 3/lineHeight) / (totalLines + Math.floor(cursorCtx.canvas.height / lineHeight)) + 3/lineHeight) * cursorCtx.canvas.height)
 }
 
 init("hello world")
