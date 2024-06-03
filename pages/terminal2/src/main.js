@@ -60,7 +60,7 @@ function ResetCursorBlink()
 {
     cursorBlink = false;
     clearInterval(cursorBlinkTicker);
-    setTimeout(() => cursorBlinkTicker = setInterval(BlinkCursor, 500), 100);
+    cursorBlinkTicker = setInterval(BlinkCursor, 500);
 }
 
 let pastingAll = false;
@@ -107,8 +107,8 @@ function init(motd)
         {
             input = input.slice(0, cursorPos - 1) + input.slice(cursorPos)
             cursorPos--
-            drawCanvas();
             ResetCursorBlink();
+            drawCanvas();
             event.preventDefault();
         }
         else if(event.code == "ArrowUp" && commandHistory.length > 0 && !event.shiftKey)
@@ -116,8 +116,8 @@ function init(motd)
             if(--commandHistoryPos < 0) commandHistoryPos = 0
             input = commandHistory[commandHistoryPos]
             cursorPos = input.length
-            drawCanvas();
             ResetCursorBlink();
+            drawCanvas();
             event.preventDefault();
         }
         else if(event.code == "ArrowDown" && commandHistory.length > 0 && !event.shiftKey)
@@ -128,8 +128,8 @@ function init(motd)
             else
                 input = commandHistory[commandHistoryPos]
             cursorPos = input.length
-            drawCanvas();
             ResetCursorBlink();
+            drawCanvas();
             event.preventDefault();
         }
         else if(event.code == "ArrowLeft" && !event.shiftKey)
@@ -153,8 +153,8 @@ function init(motd)
             input = stringReplaceShift(input, cursorPos, event.key)
             cursorPos++;
             commandHistoryPos = commandHistory.length
-            drawCanvas();
             ResetCursorBlink();
+            drawCanvas();
             event.preventDefault();
         }
     })
