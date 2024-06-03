@@ -200,10 +200,13 @@ function init(motd)
         unfocusable = false;
     });
 
-    mainElement.addEventListener("mousedown", event => {
-        consoleFocused = !unfocusable;
-        drawCanvas();
-        event.preventDefault();
+    window.addEventListener("mousedown", event => {
+        if((consoleFocused && unfocusable) || (!consoleFocused && !unfocusable))
+        {
+            consoleFocused = false;
+            drawCanvas();
+            event.preventDefault();
+        }
     });
 }
 
