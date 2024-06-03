@@ -215,7 +215,7 @@ function init(motd)
  */
 function receiveUserCommand(value)
 {
-    if(!value) return;
+    if(value === null || value === undefined) return;
 
     if(global.echo)
     {
