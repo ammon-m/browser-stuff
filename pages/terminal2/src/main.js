@@ -60,7 +60,7 @@ function ResetCursorBlink()
 {
     cursorBlink = false;
     clearInterval(cursorBlinkTicker);
-    cursorBlinkTicker = setInterval(BlinkCursor, 500);
+    setTimeout(() => cursorBlinkTicker = setInterval(BlinkCursor, 500), 100);
 }
 
 let pastingAll = false;
