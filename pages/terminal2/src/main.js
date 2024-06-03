@@ -278,7 +278,7 @@ function receiveUserCommand(value)
     }
 
     let y = terminal.GetEndPosition().y
-    if(y - maxRows > maxRows)
+    if(y - terminal._scroll > maxRows)
         terminal.ScrollTo(y + 3/lineHeight - maxRows)
 }
 
