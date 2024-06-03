@@ -190,6 +190,12 @@ function init(motd)
         event.preventDefault();
     });
 
+    mainElement.addEventListener("blur", event => {
+        consoleFocused = false;
+        drawCanvas();
+        event.preventDefault();
+    });
+
     mainElement.addEventListener("mousedown", event => {
         consoleFocused = true;
         drawCanvas();
