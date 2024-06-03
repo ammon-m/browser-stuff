@@ -190,7 +190,7 @@ function init(motd)
         event.preventDefault();
     });
 
-    window.addEventListener("mousedown", event => {
+    mainElement.addEventListener("mousedown", event => {
         consoleFocused = true;
         drawCanvas();
         event.preventDefault();
