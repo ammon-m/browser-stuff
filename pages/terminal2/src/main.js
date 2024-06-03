@@ -187,13 +187,11 @@ function init(motd)
         scroll -= val;
 
         terminal.Scroll(val);
-        event.preventDefault();
     });
 
     mainElement.addEventListener("blur", event => {
         consoleFocused = false;
         drawCanvas();
-        event.preventDefault();
     });
 
     mainElement.addEventListener("mousedown", event => {
