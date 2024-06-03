@@ -99,6 +99,7 @@ function init(motd)
         {
             consoleFocused = false;
             ResetCursorBlink();
+            drawCanvas();
             event.preventDefault();
         }
         else consoleFocused = true;
@@ -186,6 +187,13 @@ function init(motd)
         scroll -= val;
 
         terminal.Scroll(val);
+        event.preventDefault();
+    });
+
+    window.addEventListener("mousedown", event => {
+        consoleFocused = true;
+        drawCanvas();
+        event.preventDefault();
     });
 }
 
@@ -368,7 +376,7 @@ function drawCanvas()
         {
             cursorCtx.strokeStyle = theme.foreground;
             cursorCtx.lineWidth = 1;
-            cursorCtx.strokeRect((len + cursorPos) * charWidth + xPadding, (y - 1) * lineHeight + 3, charWidth, lineHeight);
+            cursorCtx.strokeRect((len + cursorPos) * charWidth + xPadding + 0.5, (y - 1) * lineHeight + 3 + 0.5, charWidth - 1, lineHeight - 1);
         }
     }
 
