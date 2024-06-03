@@ -403,7 +403,7 @@ function drawCanvas()
         cursorCtx.canvas.width - charWidth,
         (terminal._scroll / (totalLines + 2)) * cursorCtx.canvas.height,
         charWidth,
-        ((maxRows / (totalLines + maxRows)) + 3/lineHeight) * cursorCtx.canvas.height
+        (maxRows / (totalLines + maxRows + 2)) * cursorCtx.canvas.height + 3/lineHeight
     )
 }
 
