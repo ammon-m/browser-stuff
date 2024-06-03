@@ -102,7 +102,8 @@ function init(motd)
             drawCanvas();
             event.preventDefault();
         }
-        else consoleFocused = true;
+
+        if(!consoleFocused) return;
 
         if(event.code == "Enter")
         {
@@ -167,7 +168,7 @@ function init(motd)
     });
 
     window.addEventListener("paste", event => {
-        consoleFocused = true;
+        if(!consoleFocused) return;
 
         let str = event.clipboardData.getData("text/plain");
 
@@ -189,7 +190,7 @@ function init(motd)
         terminal.Scroll(val);
     });
 
-    mainElement.addEventListener("blur", event => {
+    document.body.addEventListener("focus", event => {
         consoleFocused = false;
         drawCanvas();
     });
