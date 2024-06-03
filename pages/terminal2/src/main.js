@@ -2,14 +2,14 @@ import Terminal from "./lib/CanvasRenderer.js";
 import { CommandParser } from "./lib/CommandParser.js"
 import Logger from "./lib/Logger.js"
 import ThemeColorSet from "./lib/ThemeColorSet.js"
-import Dictionary from "./lib/VariableManager.js";
+import Dictionary from "./lib/Dictionary.js";
 import * as minifs from "./lib/minifs.js"
 
 'use strict';
 
 globalThis.global = {
     user: "user",
-    device: "vm",
+    device: "Conch",
     cwd: "~",
     canType: true,
     echo: true,
@@ -42,10 +42,6 @@ function stringReplaceShift(string, index, replacement) {
 
 const font = "14px monospace"
 
-const output = {
-    value: ""
-}
-
 let input = ""
 let cursorPos = 0
 
@@ -65,8 +61,6 @@ function ResetCursorBlink()
     // cursorBlinkTicker = setInterval(BlinkCursor, 500);
 }
 
-let pastingAll = false;
-
 const theme = global.theme;
 
 export const fs = new minifs.FileSystem()
@@ -81,6 +75,8 @@ export const VERSION = Object.preventExtensions({
         return `${VERSION.breaking}.${VERSION.update}.${VERSION.patch}`;
     },
 })
+
+let consoleFocused = true;
 
 /**
  * @param {string} motd
@@ -99,6 +95,14 @@ function init(motd)
     window.addEventListener("keydown", event => {
         if(!global.canType) return;
 
+        if(event.code == "Escape")
+        {
+            consoleFocused = false;
+            ResetCursorBlink();
+            event.preventDefault();
+        }
+        else consoleFocused = true;
+
         if(event.code == "Enter")
         {
             receiveUserCommand(input);
@@ -107,74 +111,74 @@ function init(motd)
         }
         else if(event.code == "Backspace" && cursorPos >= 1)
         {
-            input = input.slice(0, cursorPos - 1) + input.slice(cursorPos)
-            cursorPos--
+            input = input.slice(0, cursorPos - 1) + input.slice(cursorPos);
+            cursorPos--;
             ResetCursorBlink();
             drawCanvas();
             event.preventDefault();
         }
         else if(event.code == "ArrowUp" && commandHistory.length > 0 && !event.shiftKey)
         {
-            if(--commandHistoryPos < 0) commandHistoryPos = 0
-            input = commandHistory[commandHistoryPos]
-            cursorPos = input.length
+            if(--commandHistoryPos < 0) commandHistoryPos = 0;
+            input = commandHistory[commandHistoryPos];
+            cursorPos = input.length;
             ResetCursorBlink();
             drawCanvas();
             event.preventDefault();
         }
         else if(event.code == "ArrowDown" && commandHistory.length > 0 && !event.shiftKey)
         {
-            if(++commandHistoryPos > commandHistory.length) commandHistoryPos = commandHistory.length
+            if(++commandHistoryPos > commandHistory.length) commandHistoryPos = commandHistory.length;
             if(commandHistoryPos == commandHistory.length)
-                input = ""
+                input = "";
             else
-                input = commandHistory[commandHistoryPos]
-            cursorPos = input.length
+                input = commandHistory[commandHistoryPos];
+            cursorPos = input.length;
             ResetCursorBlink();
             drawCanvas();
             event.preventDefault();
         }
         else if(event.code == "ArrowLeft" && !event.shiftKey)
         {
-            if(event.ctrlKey) cursorPos = 0
-            else if(cursorPos >= 1) cursorPos--
+            if(event.ctrlKey) cursorPos = 0;
+            else if(cursorPos >= 1) cursorPos--;
             ResetCursorBlink();
             drawCanvas();
             event.preventDefault();
         }
         else if(event.code == "ArrowRight" && !event.shiftKey)
         {
-            if(event.ctrlKey) cursorPos = input.length
-            else if(cursorPos <= input.length - 1) cursorPos++
+            if(event.ctrlKey) cursorPos = input.length;
+            else if(cursorPos <= input.length - 1) cursorPos++;
             ResetCursorBlink();
             drawCanvas();
             event.preventDefault();
         }
         else if(event.key.length == 1 && !event.ctrlKey && !event.metaKey)
         {
-            input = stringReplaceShift(input, cursorPos, event.key)
+            input = stringReplaceShift(input, cursorPos, event.key);
             cursorPos++;
-            commandHistoryPos = commandHistory.length
+            commandHistoryPos = commandHistory.length;
             ResetCursorBlink();
             drawCanvas();
             event.preventDefault();
         }
-    })
+    });
 
     window.addEventListener("paste", event => {
+        consoleFocused = true;
+
         let str = event.clipboardData.getData("text/plain");
 
-        input = stringReplaceShift(input, cursorPos, str)
-        cursorPos += str.length
-        commandHistoryPos = commandHistory.length
+        input = stringReplaceShift(input, cursorPos, str);
+        cursorPos += str.length;
+        commandHistoryPos = commandHistory.length;
         ResetCursorBlink();
         drawCanvas();
-
-        pastingAll = false;
         event.preventDefault();
-    }, false)
+    }, false);
 
-    let scroll = 0
+    let scroll = 0;
 
     window.addEventListener("wheel", event => {
         scroll += event.deltaY / 60;
@@ -353,12 +357,22 @@ function drawCanvas()
     if(!cursorBlink)
     {
         cursorCtx.fillStyle = theme.foreground
-        cursorCtx.fillRect((len + cursorPos) * charWidth + xPadding, (y - 1) * lineHeight + 3, charWidth, lineHeight)
+        if(consoleFocused)
+        {
+            cursorCtx.fillRect((len + cursorPos) * charWidth + xPadding, (y - 1) * lineHeight + 3, charWidth, lineHeight)
 
-        cursorCtx.fillStyle = theme.background
-        cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", (len + cursorPos) * charWidth + xPadding, y * lineHeight)
+            cursorCtx.fillStyle = theme.background
+            cursorCtx.fillText(input[cursorPos] ? input[cursorPos] : " ", (len + cursorPos) * charWidth + xPadding, y * lineHeight)
+        }
+        else
+        {
+            cursorCtx.strokeStyle = theme.foreground;
+            cursorCtx.lineWidth = 1;
+            cursorCtx.strokeRect((len + cursorPos) * charWidth + xPadding, (y - 1) * lineHeight + 3, charWidth, lineHeight);
+        }
     }
 
+    cursorCtx.fillStyle = theme.background
     cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, 0, charWidth, cursorCtx.canvas.height)
 
     const totalLines = terminal._rawText.split("\n").length;
