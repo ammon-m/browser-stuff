@@ -401,7 +401,7 @@ function drawCanvas()
     cursorCtx.fillStyle = theme.foreground
     cursorCtx.fillRect(
         cursorCtx.canvas.width - charWidth,
-        (terminal._scroll / (totalLines + maxRows + 2)) * cursorCtx.canvas.height,
+        (terminal._scroll / (totalLines + maxRows + 2 - 3/lineHeight)) * cursorCtx.canvas.height,
         charWidth,
         ((maxRows + 1) / (totalLines + maxRows)) * cursorCtx.canvas.height
     )
