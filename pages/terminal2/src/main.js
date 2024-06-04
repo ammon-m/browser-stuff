@@ -179,16 +179,17 @@ function init(motd)
     }, false);
 
     let scroll = 0;
+    let unfocusable = false;
 
     window.addEventListener("wheel", event => {
+        if(unfocusable) return;
+
         scroll += event.deltaY / 60;
         const val = Math.round(scroll);
         scroll -= val;
 
         terminal.Scroll(val);
     });
-
-    let unfocusable = false;
 
     mainElement.addEventListener("mouseleave", event => {
         unfocusable = true;
