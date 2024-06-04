@@ -16,6 +16,8 @@ globalThis.global = {
     theme: Object.freeze(ThemeColorSet.Default),
     stack: new Dictionary(),
 
+    inputState: InputState.Command,
+
     printMotd: () => {
         terminal.WriteLine("Welcome to ");
         terminal.SetBold(true);
@@ -24,6 +26,12 @@ globalThis.global = {
         terminal.Write(` [v${VERSION}]`);
         terminal.WriteLine(`An experimental browser-based shell\n`);
     }
+}
+
+/**@enum InputState */
+globalThis.InputState = {
+    Command: 0,
+    Write: 1,
 }
 
 /**
@@ -308,30 +316,34 @@ function receiveUserCommand(value)
 
     if(global.echo)
     {
-        terminal.SetColor(global.theme.user)
-        terminal.WriteLine(global.user + "@" + global.device)
+        switch(global.inputState)
+        {
+            case InputState.Command:
+                terminal.SetColor(global.theme.user)
+                terminal.WriteLine(global.user + "@" + global.device)
 
-        terminal.SetColor(global.theme.foreground)
-        terminal.Write(":")
+                terminal.SetColor(global.theme.foreground)
+                terminal.Write(":")
 
-        terminal.SetColor(global.theme.path)
-        terminal.Write(global.cwd)
+                terminal.SetColor(global.theme.path)
+                terminal.Write(global.cwd)
 
-        terminal.SetColor(global.theme.foreground)
-        terminal.Write("$ ")
+                terminal.SetColor(global.theme.foreground)
+                terminal.Write("$ ")
+                break;
+            case InputState.Write:
+                terminal.SetColor(global.theme.foreground)
+                terminal.WriteLine("> ")
+                break;
+        }
 
         terminal.Write(value)
-    }
 
+        commandHistory.push(value);
+    }
     commandHistoryPos = commandHistory.length;
 
     if(value == "") return;
-
-    if(global.echo)
-    {
-        commandHistory.push(value);
-        commandHistoryPos = commandHistory.length;
-    }
 
     input = ""
     cursorPos = 0
