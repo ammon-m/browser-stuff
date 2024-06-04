@@ -17,9 +17,9 @@ class Command
     /**
      * @param {string} name 
      * @param {any[]} parameters 
-     * @param {(event: CommandExecutionEvent) => any} callback 
+     * @param {(event: CommandExecutionEvent) => Promise<any>} callback 
      */
-    constructor(name, parameters, callback = () => {})
+    constructor(name, parameters, callback = async () => {})
     {
         this.type = "command"
         this.name = name
@@ -27,16 +27,16 @@ class Command
         this.callback = callback
     }
 
-    execute()
+    async execute()
     {
-        return this.callback(new CommandExecutionEvent(this.parameters))
+        return await this.callback(new CommandExecutionEvent(this.parameters))
     }
 }
 
 const commandsList =
 {
     /** @param {CommandExecutionEvent} event */
-    help: (event) => {
+    help: async (event) => {
         const cmd = event.parameters[0]
         let str = ""
         if(cmd.type == "EoL")
@@ -52,15 +52,15 @@ const commandsList =
         return str
     },
 
-    echo: (event) => {},
+    echo: async (event) => {},
 
     /** @param {CommandExecutionEvent} event */
-    clear: (event) => {
+    clear: async (event) => {
         logger.clear()
     },
 
     /** @param {CommandExecutionEvent} event */
-    user: (event) => {
+    user: async (event) => {
         if(event.parameters[0].value == "")
             throw new SyntaxError("First argument of user cannot be empty\n")
         else if(global.user != event.parameters[0].value)
@@ -69,8 +69,8 @@ const commandsList =
         }
     },
 
-    stack: (event) => {},
-    motd: (event) => {},
+    stack: async (event) => {},
+    motd: async (event) => {},
 }
 
 const commandsHelp =
@@ -78,7 +78,7 @@ const commandsHelp =
     help: "the ever helpful help command, helps you get some of that sweet help when you need it",
     echo: "prints the value to the log",
     clear: "clears the log",
-    user: "prints the string as raw html to the log",
+    user: "changes the username",
     stack: "provides basic functionality that allows the user to read and write to the variable stack",
     motd: "print the motd",
 }
@@ -93,8 +93,8 @@ export class CommandParser
 
         echo: () => new Command("echo", [
             this.Expression()
-        ], (event) => {
-            const val = evaluate(event.parameters[0]);
+        ], async (event) => {
+            const val = await evaluate(event.parameters[0]);
             logger.log(val);
 
             return val;
@@ -109,14 +109,14 @@ export class CommandParser
         /**@returns {Command} */
         stack: () => new Command("stack", [
             this.Word(),
-        ], (event) => {
+        ], async (event) => {
             switch(event.parameters[0].value)
             {
                 case "set":
                 {
                     const arg1 = this.Word();
                     const arg2 = this.Expression();
-                    global.stack.Set(arg1.value, evaluate(arg2));
+                    global.stack.Set(arg1.value, await evaluate(arg2));
                     return;
                 }
                 case "get":
@@ -167,8 +167,17 @@ export class CommandParser
             throw new SyntaxError("First argument must be one of: set, get, list, or flush\n");
         }),
 
-        motd: () => new Command("motd", [], (event) => {
+        motd: () => new Command("motd", [], async (event) => {
             global.printMotd();
+        }),
+
+        test: () => new Command("test", [], async (event) => {
+            global.echo = false;
+            await global.ExecuteTerminalCommand("clear");
+            await global.ExecuteTerminalCommand("motd");
+            await global.ExecuteTerminalCommand("help");
+            await global.ExecuteTerminalCommand("echo \"2 + 2 = \" + (2 + 2)");
+            global.echo = true;
         })
     }
 
@@ -228,8 +237,8 @@ export class CommandParser
                         } : this.Expression();
 
                         return new Command("", [],
-                            () => {
-                                global.stack.Set(name.value, evaluate(value));
+                            async () => {
+                                global.stack.Set(name.value, await evaluate(value));
                                 return value;
                             },
                         );
@@ -253,8 +262,8 @@ export class CommandParser
                             };
     
                             return new Command("", [],
-                                () => {
-                                    global.stack.Set(name.value, evaluate(value));
+                                async () => {
+                                    global.stack.Set(name.value, await evaluate(value));
                                     return value;
                                 },
                             );
@@ -272,8 +281,8 @@ export class CommandParser
                         };
 
                         return new Command("", [],
-                            () => {
-                                global.stack.Set(name.value, evaluate(value));
+                            async () => {
+                                global.stack.Set(name.value, await evaluate(value));
                                 return value;
                             },
                         );
@@ -480,20 +489,20 @@ try using the help command to see get help
 /**
  * @param {BinaryExpressionHead} expression
  */
-function evaluate(expression)
+async function evaluate(expression)
 {
     switch(expression.type)
     {
         case "BinaryExpression":
             switch(expression.operator)
             {
-                case "+": return evaluate(expression.left) + evaluate(expression.right);
-                case "-": return evaluate(expression.left) - evaluate(expression.right);
-                case "*": return evaluate(expression.left) * evaluate(expression.right);
-                case "/": return evaluate(expression.left) / evaluate(expression.right);
+                case "+": return await evaluate(expression.left) + await evaluate(expression.right);
+                case "-": return await evaluate(expression.left) - await evaluate(expression.right);
+                case "*": return await evaluate(expression.left) * await evaluate(expression.right);
+                case "/": return await evaluate(expression.left) / await evaluate(expression.right);
             }
         case "command":
-            return expression.execute();
+            return await expression.execute();
         case "number":
             return Number(expression.value);
         case "variable":
@@ -502,7 +511,7 @@ function evaluate(expression)
             const arr = [];
             for(var i = 0; i < expression.value.length; i++)
             {
-                arr.push(evaluate(expression.value[i]));
+                arr.push(await evaluate(expression.value[i]));
             }
             return arr;
         default:
@@ -511,6 +520,7 @@ function evaluate(expression)
 }
 
 const tokenTypes = Object.freeze({
+    path: /^([^\/\t]+(\/[^\/\t]+)*((\.[a-zA-Z0-9]+)|\/))/,
     "(": /^\(/,
     ")": /^\)/,
     "{": /^\{/,
@@ -527,7 +537,6 @@ const tokenTypes = Object.freeze({
     "|": /^\|/,
     additiveOperator: /^(\+|-)/,
     multiplicativeOperator: /^(\*|\/)/,
-    path: /^([^\/\t]+(\/[^\/\t]+)*(\.[a-zA-Z0-9]+|\/))/,
     number: /^(\d+(?:\.\d+)?)/,
     string: /^"(\\"|.)*"/,
     word: /^[a-zA-Z_][a-zA-Z_0-9]*/,

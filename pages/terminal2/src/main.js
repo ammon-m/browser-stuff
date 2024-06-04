@@ -31,7 +31,9 @@ globalThis.global = {
         terminal.SetBold(false);
         terminal.Write(` [v${VERSION}]`);
         terminal.WriteLine(`An experimental browser-based shell\n`);
-    }
+    },
+
+    ExecuteTerminalCommand: async () => {},
 }
 
 /**
@@ -110,7 +112,7 @@ let ctxMenuKillable = true;
 /**
  * @param {string} motd
  */
-function init(motd)
+async function init(motd)
 {
     if(motd)
     {
@@ -135,10 +137,10 @@ function init(motd)
     }
 
     global.echo = false;
-    receiveUserCommand("motd");
+    await receiveUserCommand("motd");
     global.echo = true;
 
-    window.addEventListener("keydown", event => {
+    window.addEventListener("keydown", async event => {
         if(event.code == "Escape")
         {
             consoleFocused = false;
@@ -151,7 +153,7 @@ function init(motd)
 
         if(event.code == "Enter")
         {
-            receiveUserCommand(input);
+            await receiveUserCommand(input);
             ResetCursorBlink();
             event.preventDefault();
         }
@@ -314,7 +316,7 @@ async function copy(event, manual = false, cut = false)
 /**
  * @param {string} value
  */
-function receiveUserCommand(value)
+async function receiveUserCommand(value)
 {
     if(value === null || value === undefined) return;
 
@@ -341,7 +343,7 @@ function receiveUserCommand(value)
                 break;
         }
 
-        terminal.Write(value)
+        terminal.Write(value);
 
         commandHistory.push(value);
     }
@@ -382,7 +384,7 @@ function receiveUserCommand(value)
     try
     {
         for(const command of commands)
-            command.execute()
+            await command.execute()
     }
     catch(error)
     {
@@ -397,6 +399,7 @@ function receiveUserCommand(value)
     if(y - terminal._scroll > maxRows)
         terminal.ScrollTo(y + 3/lineHeight - maxRows)
 }
+global.ExecuteTerminalCommand = receiveUserCommand;
 
 /**@type {string[]}*/
 const commandHistory = []

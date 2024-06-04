@@ -49,3 +49,12 @@ export class Uri
         return this.path + (this.fileExtension ? "." + this.fileExtension : "/")
     }
 }
+
+/**
+ * @param {number} value
+ * @returns {string}
+ */
+export function IntToChar(value)
+{
+    return String.fromCharCode(Number(value))[0];
+}

@@ -26,4 +26,5 @@ export class FileSystem
 class FileSystemItem
 {
     items = {}
+    data = new Uint8Array();
 }
