@@ -69,9 +69,9 @@ contextMenuElement.style.left = "0";
 contextMenuElement.style.top = "0";
 
 const contextMenuItems = {
-    cCut: (event) => { consoleFocused = true; document.execCommand('cut'); },
-    cCopy: (event) => { consoleFocused = true; document.execCommand('copy'); },
-    cPaste: (event) => { consoleFocused = true; document.execCommand('paste'); },
+    cCut:   (event) => { copy(event, true, true); ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
+    cCopy:  (event) => { copy(event, true);       ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
+    cPaste: (event) => { paste(event, true);      ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
     dTest: (event) => {},
 }
 
@@ -248,25 +248,49 @@ function init(motd)
     });
 }
 
-function paste(event, override = false)
+function paste(event, manual = false)
 {
-    if(!consoleFocused && !override) return;
+    if(!consoleFocused && !manual) return;
 
-    let str = event.clipboardData.getData("text/plain");
+    let str = "";
+    if(manual)
+    {
+        navigator.clipboard.readText()
+        .then(value => {
+            str = value;
+        })
+        .catch(() => {});
+    }
+    else
+    {
+        str = event.clipboardData.getData("text/plain");
+        event.preventDefault();
+    }
 
     input = stringReplaceShift(input, cursorPos, str);
     cursorPos += str.length;
     commandHistoryPos = commandHistory.length;
     ResetCursorBlink();
     drawCanvas();
-    event.preventDefault();
 }
 
-function copy(event, override = false, cut = false)
+function copy(event, manual = false, cut = false)
 {
-    if((!consoleFocused && !override) || input.length == 0) return;
+    if((!consoleFocused && !manual) || input.length == 0) return;
 
-    event.clipboardData.setData("text/plain", input);
+    if(manual)
+    {
+        navigator.clipboard.writeText(input)
+        .then(() => {
+            //
+        })
+        .catch(error => {});
+    }
+    else
+    {
+        event.clipboardData.setData("text/plain", input);
+        event.preventDefault();
+    }
 
     if(cut)
     {
@@ -276,8 +300,6 @@ function copy(event, override = false, cut = false)
         ResetCursorBlink();
         drawCanvas();
     }
-
-    event.preventDefault();
 }
 
 /**
