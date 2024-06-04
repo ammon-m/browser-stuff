@@ -209,7 +209,7 @@ function init(motd)
         contextMenuElement.style.left = event.clientX + "px";
         contextMenuElement.style.top = event.clientY + "px";
         contextMenuElement.classList.remove("hidden");
-    })
+    }, false)
 
     window.addEventListener("mousedown", event => {
         if(!(consoleFocused ^ unfocusable))
