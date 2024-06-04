@@ -93,8 +93,6 @@ function init(motd)
     global.echo = true;
 
     window.addEventListener("keydown", event => {
-        if(!global.canType) return;
-
         if(event.code == "Escape")
         {
             consoleFocused = false;
@@ -103,7 +101,7 @@ function init(motd)
             event.preventDefault();
         }
 
-        if(!consoleFocused) return;
+        if(!consoleFocused || !global.canType) return;
 
         if(event.code == "Enter")
         {
@@ -200,10 +198,13 @@ function init(motd)
         unfocusable = false;
     });
 
+    let contextMenu = false;
+
     window.addEventListener("mousedown", event => {
         if((consoleFocused && unfocusable) || (!consoleFocused && !unfocusable))
         {
             consoleFocused = !unfocusable;
+            if((contextMenu && !unfocusable) || unfocusable) contextMenu = false;
             drawCanvas();
             event.preventDefault();
         }
@@ -241,13 +242,13 @@ function receiveUserCommand(value)
     commandHistory.push(value)
     commandHistoryPos = commandHistory.length
 
-    console.log("[Conch] " + value)
-
     input = ""
     cursorPos = 0
 
     const parser = new CommandParser()
     let commands = null
+
+    let y = terminal.GetEndPosition().y;
 
     try
     {
@@ -259,14 +260,15 @@ function receiveUserCommand(value)
 
         error.name = "[Conch] " + error.name
         console.error(error)
+
         return;
     }
+    y = terminal.GetEndPosition().y
+
     if(commands == null)
     {
-        let y = terminal.GetEndPosition().y
         if(y - terminal._scroll > maxRows)
             terminal.ScrollTo(y + 3/lineHeight - maxRows)
-
         return;
     }
 
@@ -277,14 +279,14 @@ function receiveUserCommand(value)
     }
     catch(error)
     {
-        error.name = "CommandExecutionError"
+        error.name += ": CommandExecutionError"
         logger.error(error)
 
         error.name = "[Conch] " + error.name
         console.error(error)
     }
 
-    let y = terminal.GetEndPosition().y
+    y = terminal.GetEndPosition().y
     if(y - terminal._scroll > maxRows)
         terminal.ScrollTo(y + 3/lineHeight - maxRows)
 }

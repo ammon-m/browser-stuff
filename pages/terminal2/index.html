@@ -10,6 +10,7 @@
                 color: white;
                 font-size: 14px;
                 font-family: 'Consolas', 'Courier New', Courier, monospace;
+                position: relative;
             }
             #main {
                 width: 100%;
@@ -25,6 +26,24 @@
                 transform: translate(-50%, -50%);
                 image-rendering: crisp-edges;
             }
+
+            #contextMenu {
+                position: absolute;
+                min-width: 15ch;
+                list-style-type: none;
+                padding: 1ch;
+                background-color: #181818;
+                color: #c0c0c0;
+
+                transition: opacity 0.2s linear;
+
+                li button {
+                    border: none;
+                }
+            }
+            #contextMenu.hidden {
+                display: none !important;
+            }
         </style>
         <script>
             window.addEventListener("beforeunload", event => {
@@ -39,6 +58,12 @@
             <!-- <canvas id="link"></canvas> -->
             <canvas id="selection"></canvas>
         </div>
+        <ul id="contextMenu" class="">
+            <li><button>test</button></li>
+            <li><button>test test</button></li>
+            <hr>
+            <li><button>hi</button></li>
+        </ul>
         <script type="module" src="./src/main.js" defer></script>
     </body>
 </html>
