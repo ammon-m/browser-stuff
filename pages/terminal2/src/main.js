@@ -63,6 +63,11 @@ function ResetCursorBlink()
 
 const theme = global.theme;
 
+const contextMenuElement = document.getElementById("contextMenu");
+contextMenuElement.classList.add("hidden");
+contextMenuElement.style.left = "0";
+contextMenuElement.style.top = "0";
+
 export const fs = new minifs.FileSystem()
 
 export const VERSION = Object.preventExtensions({
@@ -199,13 +204,18 @@ function init(motd)
         unfocusable = false;
     });
 
-    let contextMenu = false;
+    mainElement.addEventListener("contextmenu", event => {
+        consoleFocused = true;
+        contextMenuElement.style.left = event.clientX + "px";
+        contextMenuElement.style.top = event.clientY + "px";
+        contextMenuElement.classList.remove("hidden");
+    })
 
     window.addEventListener("mousedown", event => {
-        if((consoleFocused && unfocusable) || (!consoleFocused && !unfocusable))
+        if(!(consoleFocused ^ unfocusable))
         {
             consoleFocused = !unfocusable;
-            if((contextMenu && !unfocusable) || unfocusable) contextMenu = false;
+            contextMenuElement.classList.add("hidden");
             drawCanvas();
             event.preventDefault();
         }
