@@ -10,7 +10,10 @@
                 color: white;
                 font-size: 14px;
                 font-family: 'Consolas', 'Courier New', Courier, monospace;
+            }
+            body {
                 position: relative;
+                overflow: hidden;
             }
             #main {
                 width: 100%;
@@ -37,10 +40,9 @@
 
                 transition: opacity 0.2s linear;
 
-                li button {
-                    border: none;
-                    background: none;
+                li {
                     color: #c0c0c0;
+                    border-radius: 2px;
                 }
                 li:hover {
                     background-color: #1f1f1f;
@@ -64,10 +66,10 @@
             <canvas id="selection"></canvas>
         </div>
         <ul id="contextMenu" class="">
-            <li><button>test</button></li>
-            <li><button>test test</button></li>
+            <li>test</li>
+            <li>test test</li>
             <hr>
-            <li><button>hi</button></li>
+            <li>hi</li>
         </ul>
         <script type="module" src="./src/main.js" defer></script>
     </body>
