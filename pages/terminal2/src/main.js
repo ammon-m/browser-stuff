@@ -69,10 +69,10 @@ contextMenuElement.style.left = "0";
 contextMenuElement.style.top = "0";
 
 const contextMenuItems = {
-    cCut: () => {},
-    cCopy: () => {},
-    cPaste: () => {},
-    dTest: () => {},
+    cCut: (event) => copy(event, true, true),
+    cCopy: (event) => copy(event, true),
+    cPaste: (event) => paste(event, true),
+    dTest: (event) => {},
 }
 
 export const fs = new minifs.FileSystem()
@@ -194,18 +194,9 @@ function init(motd)
         }
     });
 
-    window.addEventListener("paste", event => {
-        if(!consoleFocused) return;
-
-        let str = event.clipboardData.getData("text/plain");
-
-        input = stringReplaceShift(input, cursorPos, str);
-        cursorPos += str.length;
-        commandHistoryPos = commandHistory.length;
-        ResetCursorBlink();
-        drawCanvas();
-        event.preventDefault();
-    }, false);
+    window.addEventListener("cut", (event) => copy(event, false, true), false);
+    window.addEventListener("copy", copy, false);
+    window.addEventListener("paste", paste, false);
 
     let scroll = 0;
     let unfocusable = false;
@@ -239,7 +230,7 @@ function init(motd)
     });
 
     mainElement.addEventListener("contextmenu", event => {
-        consoleFocused = true;
+        consoleFocused = false;
         contextMenuElement.style.left = event.clientX + "px";
         contextMenuElement.style.top = event.clientY - lineHeight + "px";
         contextMenuElement.classList.remove("hidden");
@@ -255,6 +246,38 @@ function init(motd)
         }
         if(ctxMenuKillable) contextMenuElement.classList.add("hidden");
     });
+}
+
+function paste(event, override = false)
+{
+    if(!consoleFocused && !override) return;
+
+    let str = event.clipboardData.getData("text/plain");
+
+    input = stringReplaceShift(input, cursorPos, str);
+    cursorPos += str.length;
+    commandHistoryPos = commandHistory.length;
+    ResetCursorBlink();
+    drawCanvas();
+    event.preventDefault();
+}
+
+function copy(event, override = false, cut = false)
+{
+    if((!consoleFocused && !override) || input.length == 0) return;
+
+    event.clipboardData.setData("text/plain", input);
+
+    if(cut)
+    {
+        input = "";
+        cursorPos = 0;
+        commandHistoryPos = commandHistory.length;
+        ResetCursorBlink();
+        drawCanvas();
+    }
+
+    event.preventDefault();
 }
 
 /**
