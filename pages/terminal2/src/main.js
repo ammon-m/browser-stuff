@@ -204,6 +204,16 @@ function init(motd)
         unfocusable = false;
     });
 
+    let ctxMenuKillable = false;
+
+    contextMenuElement.addEventListener("mouseleave", event => {
+        ctxMenuKillable = true;
+    });
+
+    contextMenuElement.addEventListener("mouseenter", event => {
+        ctxMenuKillable = false;
+    });
+
     mainElement.addEventListener("contextmenu", event => {
         consoleFocused = true;
         contextMenuElement.style.left = event.clientX + "px";
@@ -219,7 +229,7 @@ function init(motd)
             drawCanvas();
             event.preventDefault();
         }
-        contextMenuElement.classList.add("hidden");
+        if(ctxMenuKillable) contextMenuElement.classList.add("hidden");
     });
 }
 
