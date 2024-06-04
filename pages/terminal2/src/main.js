@@ -233,7 +233,8 @@ function init(motd)
         contextMenuElement.style.top = event.clientY - lineHeight + "px";
         contextMenuElement.classList.remove("hidden");
         consoleFocused = false;
-        unfocusable = true;
+        unfocusable = false;
+        drawCanvas();
         event.preventDefault();
     }, false)
 
