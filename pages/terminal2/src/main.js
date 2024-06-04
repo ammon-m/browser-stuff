@@ -89,6 +89,7 @@ export const VERSION = Object.preventExtensions({
 })
 
 let consoleFocused = true;
+let ctxMenuKillable = true;
 
 /**
  * @param {string} motd
@@ -218,8 +219,6 @@ function init(motd)
     mainElement.addEventListener("mouseenter", event => {
         unfocusable = false;
     });
-
-    let ctxMenuKillable = true;
 
     contextMenuElement.addEventListener("mouseleave", event => {
         ctxMenuKillable = true;
