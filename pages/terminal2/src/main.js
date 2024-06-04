@@ -68,6 +68,13 @@ contextMenuElement.classList.add("hidden");
 contextMenuElement.style.left = "0";
 contextMenuElement.style.top = "0";
 
+const contextMenuItems = {
+    cCut: () => {},
+    cCopy: () => {},
+    cPaste: () => {},
+    dTest: () => {},
+}
+
 export const fs = new minifs.FileSystem()
 
 export const VERSION = Object.preventExtensions({
@@ -93,8 +100,25 @@ function init(motd)
         console.log(motd)
     }
 
+    let _prefix = Object.keys(contextMenuItems)[0][0];
+    for(const key of Object.keys(contextMenuItems))
+    {
+        const element = document.createElement("li");
+
+        if(_prefix != key[0])
+        {
+            _prefix = key[0];
+            contextMenuElement.appendChild(document.createElement("hr"));
+        }
+
+        element.innerText = key.slice(1);
+        element.addEventListener("click", contextMenuItems[key]);
+
+        contextMenuElement.appendChild(element);
+    }
+
     global.echo = false;
-    receiveUserCommand("motd")
+    receiveUserCommand("motd");
     global.echo = true;
 
     window.addEventListener("keydown", event => {
@@ -217,7 +241,7 @@ function init(motd)
     mainElement.addEventListener("contextmenu", event => {
         consoleFocused = true;
         contextMenuElement.style.left = event.clientX + "px";
-        contextMenuElement.style.top = event.clientY + "px";
+        contextMenuElement.style.top = event.clientY - lineHeight + "px";
         contextMenuElement.classList.remove("hidden");
         event.preventDefault();
     }, false)
