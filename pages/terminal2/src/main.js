@@ -323,12 +323,15 @@ function receiveUserCommand(value)
         terminal.Write(value)
     }
 
-    commandHistoryPos = commandHistory.length
+    commandHistoryPos = commandHistory.length;
 
     if(value == "") return;
 
-    commandHistory.push(value)
-    commandHistoryPos = commandHistory.length
+    if(global.echo)
+    {
+        commandHistory.push(value);
+        commandHistoryPos = commandHistory.length;
+    }
 
     input = ""
     cursorPos = 0
