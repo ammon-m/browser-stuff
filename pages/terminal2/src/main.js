@@ -279,17 +279,21 @@ async function paste(event, manual = false)
     drawCanvas();
 }
 
-function copy(event, manual = false, cut = false)
+async function copy(event, manual = false, cut = false)
 {
-    if((!consoleFocused && !manual) || input.length == 0) return;
+    if((!consoleFocused && !manual) || input.length == 0)
+    {
+        if(manual)
+        {
+            consoleFocused = true;
+            drawCanvas();
+        }
+        return;
+    }
 
     if(manual)
     {
-        navigator.clipboard.writeText(input)
-        .then(() => {
-            //
-        })
-        .catch(error => {});
+        await navigator.clipboard.writeText(input);
     }
     else
     {
