@@ -164,6 +164,7 @@ async function init(motd)
             cursorPos--;
             ResetCursorBlink();
             drawCanvas();
+            tryScroll();
             event.preventDefault();
         }
         else if(event.code == "ArrowUp" && commandHistory.length > 0 && !event.shiftKey)
@@ -173,6 +174,7 @@ async function init(motd)
             cursorPos = input.length;
             ResetCursorBlink();
             drawCanvas();
+            tryScroll();
             event.preventDefault();
         }
         else if(event.code == "ArrowDown" && commandHistory.length > 0 && !event.shiftKey)
@@ -185,6 +187,7 @@ async function init(motd)
             cursorPos = input.length;
             ResetCursorBlink();
             drawCanvas();
+            tryScroll();
             event.preventDefault();
         }
         else if(event.code == "ArrowLeft" && !event.shiftKey)
@@ -193,6 +196,7 @@ async function init(motd)
             else if(cursorPos >= 1) cursorPos--;
             ResetCursorBlink();
             drawCanvas();
+            tryScroll();
             event.preventDefault();
         }
         else if(event.code == "ArrowRight" && !event.shiftKey)
@@ -201,6 +205,7 @@ async function init(motd)
             else if(cursorPos <= input.length - 1) cursorPos++;
             ResetCursorBlink();
             drawCanvas();
+            tryScroll();
             event.preventDefault();
         }
         else if(event.key.length == 1 && !event.ctrlKey && !event.metaKey)
@@ -210,6 +215,7 @@ async function init(motd)
             commandHistoryPos = commandHistory.length;
             ResetCursorBlink();
             drawCanvas();
+            tryScroll();
             event.preventDefault();
         }
     });
@@ -268,6 +274,13 @@ async function init(motd)
     });
 }
 
+function tryScroll()
+{
+    let y = terminal.GetEndPosition().y
+    if(y - terminal._scroll > maxRows)
+        terminal.ScrollTo(y + 3/lineHeight - maxRows)
+}
+
 async function paste(event, manual = false)
 {
     if(!consoleFocused && !manual) return;
@@ -287,6 +300,7 @@ async function paste(event, manual = false)
     cursorPos += str.length;
     commandHistoryPos = commandHistory.length;
     ResetCursorBlink();
+    tryScroll();
     if(!manual) drawCanvas();
 }
 
