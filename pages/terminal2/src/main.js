@@ -77,10 +77,18 @@ contextMenuElement.style.left = "0";
 contextMenuElement.style.top = "0";
 
 const contextMenuItems = {
-    cCut:   (event) => { copy(event, true, true); consoleFocused = true; ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
-    cCopy:  (event) => { copy(event, true);       consoleFocused = true; ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
-    cPaste: (event) => { paste(event, true);      consoleFocused = true; ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
+    cCut:   (event) => { copy(event, true, true); contextMenuClose(); },
+    cCopy:  (event) => { copy(event, true); contextMenuClose(); },
+    cPaste: (event) => { paste(event, true); contextMenuClose(); },
     dTest: (event) => {},
+}
+
+function contextMenuClose()
+{
+    consoleFocused = true;
+    ctxMenuKillable = true;
+    contextMenuElement.classList.add("hidden");
+    drawCanvas();
 }
 
 export const fs = new minifs.FileSystem()
@@ -276,20 +284,12 @@ async function paste(event, manual = false)
     cursorPos += str.length;
     commandHistoryPos = commandHistory.length;
     ResetCursorBlink();
-    drawCanvas();
+    if(!manual) drawCanvas();
 }
 
 async function copy(event, manual = false, cut = false)
 {
-    if((!consoleFocused && !manual) || input.length == 0)
-    {
-        if(manual)
-        {
-            consoleFocused = true;
-            drawCanvas();
-        }
-        return;
-    }
+    if((!consoleFocused && !manual) || input.length == 0) return;
 
     if(manual)
     {
@@ -307,13 +307,7 @@ async function copy(event, manual = false, cut = false)
         cursorPos = 0;
         commandHistoryPos = commandHistory.length;
         ResetCursorBlink();
-        drawCanvas();
-    }
-
-    if(manual)
-    {
-        consoleFocused = true;
-        drawCanvas();
+        if(!manual) drawCanvas();
     }
 }
 
