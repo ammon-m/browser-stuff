@@ -7,6 +7,12 @@ import * as minifs from "./lib/minifs.js"
 
 'use strict';
 
+/**@enum InputState */
+globalThis.InputState = {
+    Command: 0,
+    Write: 1,
+}
+
 globalThis.global = {
     user: "user",
     device: "Conch",
@@ -26,12 +32,6 @@ globalThis.global = {
         terminal.Write(` [v${VERSION}]`);
         terminal.WriteLine(`An experimental browser-based shell\n`);
     }
-}
-
-/**@enum InputState */
-globalThis.InputState = {
-    Command: 0,
-    Write: 1,
 }
 
 /**
