@@ -216,10 +216,10 @@ function init(motd)
         if(!(consoleFocused ^ unfocusable))
         {
             consoleFocused = !unfocusable;
-            contextMenuElement.classList.add("hidden");
             drawCanvas();
             event.preventDefault();
         }
+        contextMenuElement.classList.add("hidden");
     });
 }
 
