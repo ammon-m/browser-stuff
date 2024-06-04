@@ -309,6 +309,12 @@ async function copy(event, manual = false, cut = false)
         ResetCursorBlink();
         drawCanvas();
     }
+
+    if(manual)
+    {
+        consoleFocused = true;
+        drawCanvas();
+    }
 }
 
 /**
