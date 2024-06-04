@@ -69,9 +69,9 @@ contextMenuElement.style.left = "0";
 contextMenuElement.style.top = "0";
 
 const contextMenuItems = {
-    cCut: (event) => copy(event, true, true),
-    cCopy: (event) => copy(event, true),
-    cPaste: (event) => paste(event, true),
+    cCut: (event) => { consoleFocused = true; document.execCommand('cut'); },
+    cCopy: (event) => { consoleFocused = true; document.execCommand('copy'); },
+    cPaste: (event) => { consoleFocused = true; document.execCommand('paste'); },
     dTest: (event) => {},
 }
 
