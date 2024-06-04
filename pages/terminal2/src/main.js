@@ -69,9 +69,9 @@ contextMenuElement.style.left = "0";
 contextMenuElement.style.top = "0";
 
 const contextMenuItems = {
-    cCut:   (event) => { copy(event, true, true); ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
-    cCopy:  (event) => { copy(event, true);       ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
-    cPaste: (event) => { paste(event, true);      ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
+    cCut:   (event) => { consoleFocused = true; copy(event, true, true); ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
+    cCopy:  (event) => { consoleFocused = true; copy(event, true);       ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
+    cPaste: (event) => { consoleFocused = true; paste(event, true);      ctxMenuKillable = true; contextMenuElement.classList.add("hidden"); },
     dTest: (event) => {},
 }
 
