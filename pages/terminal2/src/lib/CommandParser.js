@@ -173,7 +173,7 @@ export class CommandParser
 
         test: () => new Command("test", [], async (event) => {
             global.echo = false;
-            await global.ExecuteTerminalCommand("clear");
+            await global.ExecuteTerminalCommand("echo \"these commands are synthetic user inputs!\"");
             await global.ExecuteTerminalCommand("motd");
             await global.ExecuteTerminalCommand("help");
             await global.ExecuteTerminalCommand("echo \"2 + 2 = \" + (2 + 2)");

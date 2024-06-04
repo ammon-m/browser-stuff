@@ -155,6 +155,7 @@ async function init(motd)
         {
             await receiveUserCommand(input);
             ResetCursorBlink();
+            drawCanvas();
             event.preventDefault();
         }
         else if(event.code == "Backspace" && cursorPos >= 1)
