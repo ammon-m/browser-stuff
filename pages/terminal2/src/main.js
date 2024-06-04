@@ -229,10 +229,11 @@ function init(motd)
     });
 
     mainElement.addEventListener("contextmenu", event => {
-        consoleFocused = false;
         contextMenuElement.style.left = event.clientX + "px";
         contextMenuElement.style.top = event.clientY - lineHeight + "px";
         contextMenuElement.classList.remove("hidden");
+        consoleFocused = false;
+        unfocusable = true;
         event.preventDefault();
     }, false)
 
