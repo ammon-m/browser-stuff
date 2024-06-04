@@ -204,7 +204,7 @@ function init(motd)
         unfocusable = false;
     });
 
-    let ctxMenuKillable = false;
+    let ctxMenuKillable = true;
 
     contextMenuElement.addEventListener("mouseleave", event => {
         ctxMenuKillable = true;
