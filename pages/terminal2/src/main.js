@@ -247,18 +247,14 @@ function init(motd)
     });
 }
 
-function paste(event, manual = false)
+async function paste(event, manual = false)
 {
     if(!consoleFocused && !manual) return;
 
     let str = "";
     if(manual)
     {
-        navigator.clipboard.readText()
-        .then(value => {
-            str = value;
-        })
-        .catch(() => {});
+        str = await navigator.clipboard.readText();
     }
     else
     {
