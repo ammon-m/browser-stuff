@@ -209,6 +209,7 @@ function init(motd)
         contextMenuElement.style.left = event.clientX + "px";
         contextMenuElement.style.top = event.clientY + "px";
         contextMenuElement.classList.remove("hidden");
+        event.preventDefault();
     }, false)
 
     window.addEventListener("mousedown", event => {
