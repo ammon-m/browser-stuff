@@ -350,7 +350,7 @@ async function paste(event, manual = false)
     commandHistoryPos = commandHistory.length;
     ResetCursorBlink();
     tryScroll();
-    if(!manual) drawCanvas();
+    drawCanvas();
 }
 
 async function copy(event, manual = false, cut = false)
@@ -373,7 +373,7 @@ async function copy(event, manual = false, cut = false)
         cursorPos = 0;
         commandHistoryPos = commandHistory.length;
         ResetCursorBlink();
-        if(!manual) drawCanvas();
+        drawCanvas();
     }
 }
 
