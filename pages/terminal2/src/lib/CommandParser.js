@@ -187,48 +187,63 @@ export class CommandParser
         }),
 
         maybe: () => new Command("maybe", [], async (event) => {
-            async function ask(badInput = false)
-            {
-                global.echo = false;
-
-                if(badInput)
-                    await global.ExecuteTerminalCommand('echo "input value must be one of y or n!"');
-                else
-                    await global.ExecuteTerminalCommand('echo "example question [y/n]"');
-
-                global.inputState = InputState.Write;
-                global.echo = true;
-                global.canType = true;
-
-                terminal.Redraw();
-
-                let input = await global.ReadCommand();
-
-                global.inputState = InputState.Command;
-                global.echo = false;
-                global.canType = false;
-
-                switch(input)
-                {
-                    case "y":
-                        await global.ExecuteTerminalCommand('echo "user said yes"');
-                        await global.ExecuteTerminalCommand('echo "yay!!!"');
-                        return input;
-                    case "n":
-                        await global.ExecuteTerminalCommand('echo "user said no"');
-                        await global.ExecuteTerminalCommand('echo "man...."');
-                        return input;
-                    default:
-                        return await ask(true);
+            return await this.ask("example question",
+                async () => {
+                    await global.ExecuteTerminalCommand('echo "user said yes"');
+                    await global.ExecuteTerminalCommand('echo "yay!!!"');
+                },
+                async () => {
+                    await global.ExecuteTerminalCommand('echo "user said no"');
+                    await global.ExecuteTerminalCommand('echo "man...."');
                 }
-            }
-            let answer = await ask();
-
-            global.inputState = InputState.Command;
-            global.echo = true;
-
-            return answer;
+            );
         }),
+    }
+
+    /**
+     * halt execution until user confirms a yes or no question
+     * @param {string} question
+     * @param {() => Promise<void>} yes
+     * @param {() => Promise<void>} no
+     * @param {boolean} badInput
+     * 
+     * @returns {Promise<string>} `y` or `n`
+     */
+    async ask(question, yes, no, badInput = false)
+    {
+        global.echo = false;
+
+        if(badInput)
+            await global.ExecuteTerminalCommand('echo "value must be one of y or n!"');
+        else
+            await global.ExecuteTerminalCommand('echo "' + question + ' [y/n]"');
+
+        global.inputState = InputState.Write;
+        global.echo = true;
+        global.canType = true;
+
+        terminal.Redraw();
+
+        let input = await global.ReadCommand();
+
+        global.inputState = InputState.Command;
+        global.echo = false;
+        global.canType = false;
+
+        switch(input)
+        {
+            case "y":
+                await yes();
+                global.echo = true;
+                return input;
+            case "n":
+                await no();
+                global.echo = true;
+                return input;
+            default:
+                global.echo = true;
+                return await this.ask(question, yes, no, true);
+        }
     }
 
     /**
