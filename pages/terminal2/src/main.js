@@ -400,21 +400,20 @@ async function receiveUserCommand(value)
     const parser = new CommandParser()
     let commands = null
 
-    let y = terminal.GetEndPosition().y;
+    if(global.inputState == InputState.Command)
+        try
+        {
+            commands = parser.parse(value)
+        }
+        catch(error)
+        {
+            logger.error(error)
 
-    try
-    {
-        commands = parser.parse(value)
-    }
-    catch(error)
-    {
-        logger.error(error)
+            error.name = "[Conch] " + error.name
+            console.error(error)
 
-        error.name = "[Conch] " + error.name
-        console.error(error)
-
-        return;
-    }
+            return;
+        }
     y = terminal.GetEndPosition().y
 
     if(commands == null)
