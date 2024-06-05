@@ -207,7 +207,7 @@ export class CommandParser
                 ret = out;
                 for(const line of out.split(/\r?\n/g))
                 {
-                    await global.ExecuteTerminalCommand('echo "' + line + '"');
+                    await global.ExecuteTerminalCommand('echo "' + line.replaceAll("\"", "\\\"") + '"');
                 }
             })
 
