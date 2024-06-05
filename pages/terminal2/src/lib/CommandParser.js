@@ -564,7 +564,7 @@ async function evaluate(expression)
 }
 
 const tokenTypes = Object.freeze({
-    path: /^([^\/\t]+(\/[^\/\t]+)*((\.[a-zA-Z0-9]+)|\/))/,
+    string: /^"(\\"|.)*?"/,
     "(": /^\(/,
     ")": /^\)/,
     "{": /^\{/,
@@ -581,8 +581,8 @@ const tokenTypes = Object.freeze({
     "|": /^\|/,
     additiveOperator: /^(\+|-)/,
     multiplicativeOperator: /^(\*|\/)/,
+    // path: /^([^\/\t]+(\/[^\/\t]+)*((\.[a-zA-Z0-9]+)|\/))/,
     number: /^(\d+(?:\.\d+)?)/,
-    string: /^"(\\"|.)*"/,
     word: /^[a-zA-Z_][a-zA-Z_0-9]*/,
     boolean: /^(true|false)/,
     EoL: /^\s*$/,
