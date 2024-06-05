@@ -37,10 +37,10 @@ globalThis.global = {
                 global.inputListeners.splice(idx, 1);
             }
         },
-        invokeAll: async (value) => {
+        invokeAll: (value) => {
             for(const listener of global.inputListeners)
             {
-                await listener.callback(value);
+                listener.callback(value);
             }
         },
     }),
@@ -413,7 +413,7 @@ async function receiveUserCommand(value)
     }
     commandHistoryPos = commandHistory.length;
 
-    await global.inputListeners.invokeAll(value);
+    global.inputListeners.invokeAll(value);
 
     if(value == "") return;
 
