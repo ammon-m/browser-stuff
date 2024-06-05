@@ -208,17 +208,14 @@ export class CommandParser
      * 
      * @returns {Promise<string>} `y` or `n`
      */
-    async ask(question, yes, no, badInput = false, hideEcho = false)
+    async ask(question, yes, no, badInput = false)
     {
         global.echo = false;
 
-        if(!hideEcho)
-        {
-            if(badInput)
-                await global.ExecuteTerminalCommand('echo "value must be one of y or n!"');
-            else
-                await global.ExecuteTerminalCommand('echo "' + question + ' [y/n]"');
-        }
+        if(badInput)
+            await global.ExecuteTerminalCommand('echo "value must be one of y or n!"');
+        else
+            await global.ExecuteTerminalCommand('echo "' + question + ' [y/n]"');
 
         global.inputState = InputState.Write;
         global.echo = true;
@@ -226,7 +223,9 @@ export class CommandParser
 
         terminal.Redraw();
 
-        let input = await global.ReadCommand(); // wait for input by user first (I could use this for file streams!)
+        let input = ""
+        while(input === "")
+            input = await global.ReadCommand(); // wait for input by user first (I could use this for file streams!)
 
         global.inputState = InputState.Command;
         global.echo = false;
@@ -243,7 +242,7 @@ export class CommandParser
                 global.echo = true;
                 return input;
             default:
-                return await this.ask(question, yes, no, true, input.length == 0);
+                return await this.ask(question, yes, no, true);
         }
     }
 
