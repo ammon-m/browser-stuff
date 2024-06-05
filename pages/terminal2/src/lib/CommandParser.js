@@ -401,7 +401,7 @@ try using the help command to see get help
         const string = token.value.startsWith('"')
         return {
             type: "string",
-            value: string ? token.value.slice(1, token.value.length - 1) : token.value // remove quotes
+            value: string ? token.value.slice(1, token.value.length - 1).replaceAll("\\\"", "\"") : token.value
         }
     }
 
