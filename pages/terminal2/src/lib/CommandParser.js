@@ -242,10 +242,8 @@ export class CommandParser
                 await no();
                 global.echo = true;
                 return input;
-            case "":
-                return await this.ask(question, yes, no, true, true);
             default:
-                return await this.ask(question, yes, no, true);
+                return await this.ask(question, yes, no, true, input.length == 0);
         }
     }
 
