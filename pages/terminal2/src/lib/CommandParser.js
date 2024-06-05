@@ -172,11 +172,17 @@ export class CommandParser
         }),
 
         test: () => new Command("test", [], async (event) => {
+            const testValue =
+            `echo "these commands are synthetic user inputs!"
+            motd
+            help
+            echo "2 + 2 = " + (2 + 2)`
+
             global.echo = false;
-            await global.ExecuteTerminalCommand("echo \"these commands are synthetic user inputs!\"");
-            await global.ExecuteTerminalCommand("motd");
-            await global.ExecuteTerminalCommand("help");
-            await global.ExecuteTerminalCommand("echo \"2 + 2 = \" + (2 + 2)");
+            for(const line of testValue.split(/\r?\n/g))
+            {
+                await global.ExecuteTerminalCommand(line);
+            }
             global.echo = true;
         }),
 
