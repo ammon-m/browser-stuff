@@ -1,4 +1,4 @@
-import Terminal from "./lib/CanvasRenderer.js";
+import Terminal from "./lib/Terminal.js";
 import { CommandParser } from "./lib/CommandParser.js"
 import Logger from "./lib/Logger.js"
 import ThemeColorSet from "./lib/ThemeColorSet.js"
@@ -34,6 +34,14 @@ globalThis.global = {
     },
 
     ExecuteTerminalCommand: async () => {},
+    ReadCommand: async () => "",
+    Sleep: (ms) => {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                resolve(ms)
+            }, ms )
+        })
+    },
 }
 
 /**
@@ -153,7 +161,9 @@ async function init(motd)
 
         if(event.code == "Enter")
         {
+            global.canType = false;
             await receiveUserCommand(input);
+            global.canType = true;
             ResetCursorBlink();
             drawCanvas();
             event.preventDefault();
@@ -280,6 +290,24 @@ function tryScroll()
     if(y - terminal._scroll > maxRows)
         terminal.ScrollTo(y + 3/lineHeight - maxRows)
 }
+
+function readCommand()
+{
+    return new Promise((resolve, reject) => {
+        window.addEventListener("keydown", listener, false);
+        const listener = event => {
+            if(!consoleFocused || !global.canType) return;
+
+            if(event.code == "Enter")
+            {
+                event.preventDefault();
+                window.removeEventListener("keydown", listener);
+                resolve(input);
+            }
+        };
+    });
+}
+global.ReadCommand = readCommand;
 
 async function paste(event, manual = false)
 {
@@ -489,23 +517,38 @@ function drawCanvas()
     let x = 0
     let y = end.y - terminal._scroll
 
-    let len = (global.user + "@" + global.device + ":" + global.cwd + "$ ").length
+    let len
 
-    cursorCtx.fillStyle = theme.user;
-    cursorCtx.fillText(global.user + "@" + global.device, x * charWidth + xPadding, y * lineHeight);
-    x += (global.user + "@" + global.device).length
+    switch(global.inputState)
+    {
+        case InputState.Write:
+            len = 2
+            cursorCtx.fillStyle = theme.foreground;
+            cursorCtx.fillText("> ", x * charWidth + xPadding, y * lineHeight);
+            x += 2
 
-    cursorCtx.fillStyle = theme.foreground;
-    cursorCtx.fillText(":", x * charWidth + xPadding, y * lineHeight);
-    x++
+            break;
+        case InputState.Command: default:
+            len = (global.user + "@" + global.device + ":" + global.cwd + "$ ").length
 
-    cursorCtx.fillStyle = theme.path;
-    cursorCtx.fillText(global.cwd, x * charWidth + xPadding, y * lineHeight);
-    x += global.cwd.length
+            cursorCtx.fillStyle = theme.user;
+            cursorCtx.fillText(global.user + "@" + global.device, x * charWidth + xPadding, y * lineHeight);
+            x += (global.user + "@" + global.device).length
 
-    cursorCtx.fillStyle = theme.foreground;
-    cursorCtx.fillText("$ ", x * charWidth + xPadding, y * lineHeight);
-    x += 2
+            cursorCtx.fillStyle = theme.foreground;
+            cursorCtx.fillText(":", x * charWidth + xPadding, y * lineHeight);
+            x++
+
+            cursorCtx.fillStyle = theme.path;
+            cursorCtx.fillText(global.cwd, x * charWidth + xPadding, y * lineHeight);
+            x += global.cwd.length
+
+            cursorCtx.fillStyle = theme.foreground;
+            cursorCtx.fillText("$ ", x * charWidth + xPadding, y * lineHeight);
+            x += 2
+
+            break;
+    }
 
     cursorCtx.fillStyle = theme.foreground;
     cursorCtx.fillText(input, x * charWidth + xPadding, y * lineHeight);

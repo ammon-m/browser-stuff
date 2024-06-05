@@ -178,7 +178,42 @@ export class CommandParser
             await global.ExecuteTerminalCommand("help");
             await global.ExecuteTerminalCommand("echo \"2 + 2 = \" + (2 + 2)");
             global.echo = true;
-        })
+        }),
+
+        maybe: () => new Command("maybe", [], async (event) => {
+            async function ask(badInput = false)
+            {
+                if(badInput)
+                    await global.ExecuteTerminalCommand("echo \"input value must be one of y or n!\"");
+                else
+                    await global.ExecuteTerminalCommand("echo \"example question [y/n]\"");
+
+                global.inputState = InputState.Write;
+                global.echo = true;
+
+                let input = await global.ReadCommand();
+                global.echo = false;
+
+                switch(input)
+                {
+                    case "y":
+                        await global.ExecuteTerminalCommand("echo \"user said yes. yay!!!\"");
+                        return input;
+                    case "n":
+                        await global.ExecuteTerminalCommand("echo \"user said no.\"");
+                        await global.ExecuteTerminalCommand("echo \"man....\"");
+                        return input;
+                    default:
+                        return await ask(true);
+                }
+            }
+            let answer = await ask();
+
+            global.inputState = InputState.Command;
+            global.echo = true;
+
+            return answer;
+        }),
     }
 
     /**

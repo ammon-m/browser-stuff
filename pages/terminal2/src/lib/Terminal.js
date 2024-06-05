@@ -216,6 +216,18 @@ export default class Terminal
 
         return {x, y};
     }
+
+    /**@returns {Promise<KeyboardEvent>} */
+    ReadKey()
+    {
+        return new Promise((resolve, reject) => {
+            window.addEventListener("keydown", listener, false);
+            const listener = event => {
+                window.removeEventListener("keydown", listener)
+                resolve(event)
+            }
+        });
+    }
 }
 
 class TextSymbol
