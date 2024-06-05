@@ -202,7 +202,7 @@ export class CommandParser
         license: () => new Command("license", [], async (event) => {
             let ret = "";
 
-            const out = await (await fetch("/LICENSE")).text()
+            const out = await (await fetch(ROOTPATH + "/LICENSE")).text()
 
             await this.ask("u sure?", async () => {
                 ret = out;

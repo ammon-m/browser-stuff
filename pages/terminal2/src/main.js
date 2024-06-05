@@ -7,6 +7,8 @@ import * as minifs from "./lib/minifs.js"
 
 'use strict';
 
+globalThis.ROOTPATH = "/browser-stuff";
+
 /**@enum InputState */
 globalThis.InputState = {
     Command: 0,
