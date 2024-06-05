@@ -202,9 +202,8 @@ export class CommandParser
         license: () => new Command("license", [], async (event) => {
             let ret = "";
 
-            const out = await (await fetch(ROOTPATH + "/LICENSE")).text()
-
             await this.ask("u sure?", async () => {
+                const out = await (await fetch(ROOTPATH + "/LICENSE")).text()
                 ret = out;
                 for(const line of out.split(/\r?\n/g))
                 {
