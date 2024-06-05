@@ -413,7 +413,7 @@ async function receiveUserCommand(value)
     }
     commandHistoryPos = commandHistory.length;
 
-    await inputListeners.invokeAll(value);
+    await global.inputListeners.invokeAll(value);
 
     if(value == "") return;
 
