@@ -163,9 +163,8 @@ async function init(motd)
         {
             global.canType = false;
             try {
-                input.split(";").forEach(value => {
-                    await receiveUserCommand(value);
-                })
+                const arr = input.split(";")
+                for(const val of arr) await receiveUserCommand(val);
             } catch {}
             global.canType = true;
             global.inputState = InputState.Command;
