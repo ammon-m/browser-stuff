@@ -30,7 +30,7 @@ globalThis.global = {
         },
         removeListener: (listener) => {
             const idx = global.inputListeners.findIndex(value => {
-                return (value.id == listener.id || Object.is(value, listener) || value.id == listener);
+                return (Object.is(value, listener) || value.id == listener.id || value.id == listener);
             });
             if(idx != -1)
             {
@@ -62,8 +62,8 @@ globalThis.global = {
     ReadCommand: () => {
         return new Promise((resolve, reject) => {
             const listener = global.inputListeners.addListener((input) => {
-                global.inputListeners.removeListener(listener);
                 resolve(input);
+                global.inputListeners.removeListener(listener);
             });
         });
     },
@@ -197,10 +197,8 @@ async function init(motd)
         if(event.code == "Enter")
         {
             global.canType = false;
-            try {
-                const arr = input.split(";")
-                for(const val of arr) await receiveUserCommand(val);
-            } catch {}
+            global.inputListeners.invokeAll(input);
+            await receiveUserCommand(input);
             global.canType = true;
             global.inputState = InputState.Command;
             ResetCursorBlink();
@@ -412,8 +410,6 @@ async function receiveUserCommand(value)
         commandHistory.push(value);
     }
     commandHistoryPos = commandHistory.length;
-
-    global.inputListeners.invokeAll(value);
 
     if(value == "") return;
 
