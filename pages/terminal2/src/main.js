@@ -199,19 +199,8 @@ async function init(motd)
         if(event.code == "Enter")
         {
             global.canType = false;
-
-            try {
-                const arr = input.split(";;")
-                const echo = global.echo;
-                for(const val of arr)
-                {
-                    global.inputListeners.invokeAll(val);
-                    await receiveUserCommand(val);
-                    global.echo = false;
-                }
-                global.echo = true;
-            } catch {}
-
+            global.inputListeners.invokeAll(input);
+            await receiveUserCommand(input);
             global.canType = true;
             global.inputState = InputState.Command;
             ResetCursorBlink();
