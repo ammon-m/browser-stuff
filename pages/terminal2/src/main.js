@@ -199,13 +199,13 @@ async function init(motd)
         if(event.code == "Enter")
         {
             global.canType = false;
-            global.inputListeners.invokeAll(input);
 
             try {
                 const arr = input.split(";;")
                 const echo = global.echo;
                 for(const val of arr)
                 {
+                    global.inputListeners.invokeAll(val);
                     await receiveUserCommand(val);
                     global.echo = false;
                 }
