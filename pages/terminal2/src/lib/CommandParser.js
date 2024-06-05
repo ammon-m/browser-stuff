@@ -62,7 +62,7 @@ const commandsList =
         {
             let echo = global.echo
             global.echo = false;
-            await global.ExecuteTerminalCommand("motd");
+            await global.ExecuteTerminalCommand("echo motd");
             global.echo = echo;
         }
     },
