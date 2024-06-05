@@ -198,13 +198,50 @@ export class CommandParser
                 }
             );
         }),
+
+        license: () => new Command("license", [], async (event) => {
+            let ret = "";
+
+            const out = `MIT License
+
+Copyright (c) 2024 bscit
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+`;
+
+            await this.ask("u sure?", async () => {
+                ret = out;
+                for(const line of out.split(/\r?\n/g))
+                {
+                    await global.ExecuteTerminalCommand('echo "' + line + '"');
+                }
+            })
+
+            return ret;
+        })
     }
 
     /**
      * halt execution until user confirms a yes or no question
      * @param {string} question
-     * @param {() => Promise<void>} yes
-     * @param {() => Promise<void>} no
+     * @param {async () => {}} yes
+     * @param {async () => {}} no
      * 
      * @returns {Promise<string>} `y` or `n`
      */
@@ -232,11 +269,11 @@ export class CommandParser
         switch(input)
         {
             case "y":
-                await yes();
+                if(yes) await yes();
                 global.echo = true;
                 return input;
             case "n":
-                await no();
+                if(no) await no();
                 global.echo = true;
                 return input;
             default:
