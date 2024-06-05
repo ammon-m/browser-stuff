@@ -221,11 +221,11 @@ export default class Terminal
     ReadKey()
     {
         return new Promise((resolve, reject) => {
-            window.addEventListener("keydown", listener, false);
             const listener = event => {
                 window.removeEventListener("keydown", listener)
                 resolve(event)
             }
+            window.addEventListener("keydown", listener, false);
         });
     }
 }

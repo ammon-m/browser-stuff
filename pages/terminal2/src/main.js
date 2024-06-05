@@ -294,7 +294,6 @@ function tryScroll()
 function readCommand()
 {
     return new Promise((resolve, reject) => {
-        window.addEventListener("keydown", listener, false);
         const listener = event => {
             if(!consoleFocused || !global.canType) return;
 
@@ -305,6 +304,7 @@ function readCommand()
                 resolve(input);
             }
         };
+        window.addEventListener("keydown", listener, false);
     });
 }
 global.ReadCommand = readCommand;
