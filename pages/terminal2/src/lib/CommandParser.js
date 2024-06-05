@@ -192,6 +192,7 @@ export class CommandParser
 
                 global.inputState = InputState.Write;
                 global.echo = true;
+                global.canType = true;
 
                 terminal.Redraw();
 
@@ -199,6 +200,7 @@ export class CommandParser
 
                 global.inputState = InputState.Command;
                 global.echo = false;
+                global.canType = false;
 
                 switch(input)
                 {
