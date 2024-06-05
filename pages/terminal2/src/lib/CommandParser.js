@@ -57,6 +57,14 @@ const commandsList =
     /** @param {CommandExecutionEvent} event */
     clear: async (event) => {
         logger.clear()
+        if(!event.parameters[0]) return;
+        if(event.parameters[0] == "m" || event.parameters[0] == "M")
+        {
+            let echo = global.echo
+            global.echo = false;
+            await global.ExecuteTerminalCommand("motd");
+            global.echo = echo;
+        }
     },
 
     /** @param {CommandExecutionEvent} event */
@@ -100,7 +108,12 @@ export class CommandParser
             return val;
         }),
 
-        clear: () => new Command("clear", [], commandsList.clear),
+        clear: () => new Command("clear",
+            this._lookAhead.value == "-" ? (() => {
+                this.eat("additiveOperator");
+                return this.Word();
+            })() : [],
+        commandsList.clear),
 
         user: () => new Command("user", [
             this.String(),
