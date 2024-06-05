@@ -24,6 +24,27 @@ globalThis.global = {
 
     inputState: InputState.Command,
 
+    inputListeners: Object.assign([], {
+        addListener: (listener) => {
+            global.inputListeners.push({id: _inputListenerId++, callback: listener})
+        },
+        removeListener: (listener) => {
+            const idx = global.inputListeners.findIndex(value => {
+                return (value.id == listener.id || Object.is(value, listener) || value.id == listener);
+            });
+            if(idx != -1)
+            {
+                global.inputListeners.splice(idx, 1);
+            }
+        },
+        invokeAll: async (value) => {
+            for(const listener of global.inputListeners)
+            {
+                await listener.callback(value);
+            }
+        },
+    }),
+
     printMotd: () => {
         terminal.WriteLine("Welcome to ");
         terminal.SetBold(true);
@@ -34,7 +55,19 @@ globalThis.global = {
     },
 
     ExecuteTerminalCommand: async () => {},
-    ReadCommand: async () => "",
+
+    /**
+     * @returns {Promise<string>}
+     */
+    ReadCommand: () => {
+        return new Promise((resolve, reject) => {
+            const listener = global.inputListeners.addListener((input) => {
+                global.inputListeners.removeListener(listener);
+                resolve(input);
+            });
+        });
+    },
+
     Sleep: (ms) => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
@@ -116,6 +149,8 @@ export const VERSION = Object.preventExtensions({
 
 let consoleFocused = true;
 let ctxMenuKillable = true;
+
+let _inputListenerId = 0;
 
 /**
  * @param {string} motd
@@ -295,24 +330,6 @@ function tryScroll()
         terminal.ScrollTo(y + 3/lineHeight - maxRows)
 }
 
-function readCommand()
-{
-    return new Promise((resolve, reject) => {
-        const listener = event => {
-            if(!consoleFocused || !global.canType) return;
-
-            if(event.code == "Enter")
-            {
-                event.preventDefault();
-                window.removeEventListener("keydown", listener);
-                resolve(input);
-            }
-        };
-        window.addEventListener("keydown", listener, false);
-    });
-}
-global.ReadCommand = readCommand;
-
 async function paste(event, manual = false)
 {
     if(!consoleFocused && !manual) return;
@@ -395,6 +412,8 @@ async function receiveUserCommand(value)
         commandHistory.push(value);
     }
     commandHistoryPos = commandHistory.length;
+
+    await inputListeners.invokeAll(value);
 
     if(value == "") return;
 
