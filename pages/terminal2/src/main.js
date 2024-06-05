@@ -162,8 +162,13 @@ async function init(motd)
         if(event.code == "Enter")
         {
             global.canType = false;
-            await receiveUserCommand(input);
+            try {
+                input.split(";").forEach(value => {
+                    await receiveUserCommand(value);
+                })
+            } catch {}
             global.canType = true;
+            global.inputState = InputState.Command;
             ResetCursorBlink();
             drawCanvas();
             event.preventDefault();

@@ -183,25 +183,32 @@ export class CommandParser
         maybe: () => new Command("maybe", [], async (event) => {
             async function ask(badInput = false)
             {
+                global.echo = false;
+
                 if(badInput)
-                    await global.ExecuteTerminalCommand("echo \"input value must be one of y or n!\"");
+                    await global.ExecuteTerminalCommand('echo "input value must be one of y or n!"');
                 else
-                    await global.ExecuteTerminalCommand("echo \"example question [y/n]\"");
+                    await global.ExecuteTerminalCommand('echo "example question [y/n]"');
 
                 global.inputState = InputState.Write;
                 global.echo = true;
 
+                terminal.Redraw();
+
                 let input = await global.ReadCommand();
+
+                global.inputState = InputState.Command;
                 global.echo = false;
 
                 switch(input)
                 {
                     case "y":
-                        await global.ExecuteTerminalCommand("echo \"user said yes. yay!!!\"");
+                        await global.ExecuteTerminalCommand('echo "user said yes"');
+                        await global.ExecuteTerminalCommand('echo "yay!!!"');
                         return input;
                     case "n":
-                        await global.ExecuteTerminalCommand("echo \"user said no.\"");
-                        await global.ExecuteTerminalCommand("echo \"man....\"");
+                        await global.ExecuteTerminalCommand('echo "user said no"');
+                        await global.ExecuteTerminalCommand('echo "man...."');
                         return input;
                     default:
                         return await ask(true);
