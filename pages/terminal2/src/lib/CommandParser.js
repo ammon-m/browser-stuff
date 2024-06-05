@@ -57,7 +57,7 @@ const commandsList =
     /** @param {CommandExecutionEvent} event */
     clear: async (event) => {
         logger.clear()
-        if(!event.parameters[0]) return;
+        if(event.parameters[0] === undefined) return;
         if(event.parameters[0].value == "m" || event.parameters[0].value == "M")
         {
             let echo = global.echo
@@ -111,7 +111,7 @@ export class CommandParser
         clear: () => new Command("clear",
             this._lookAhead.value == "-" ? (() => {
                 this.eat("additiveOperator");
-                return this.Word();
+                return [this.Word()];
             })() : [],
         commandsList.clear),
 
