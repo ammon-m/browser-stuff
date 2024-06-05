@@ -58,11 +58,11 @@ const commandsList =
     clear: async (event) => {
         logger.clear()
         if(!event.parameters[0]) return;
-        if(event.parameters[0] == "m" || event.parameters[0] == "M")
+        if(event.parameters[0].value == "m" || event.parameters[0].value == "M")
         {
             let echo = global.echo
             global.echo = false;
-            await global.ExecuteTerminalCommand("echo motd");
+            await global.ExecuteTerminalCommand("motd");
             global.echo = echo;
         }
     },
