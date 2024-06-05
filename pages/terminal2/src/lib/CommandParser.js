@@ -217,18 +217,13 @@ export class CommandParser
         else
             await global.ExecuteTerminalCommand('echo "' + question + ' [y/n]"');
 
-        let input = ""
+        global.inputState = InputState.Write;
+        global.echo = true;
+        global.canType = true;
 
-        while(input === "")
-        {
-            global.inputState = InputState.Write;
-            global.echo = true;
-            global.canType = true;
-    
-            terminal.Redraw();
+        terminal.Redraw();
 
-            input = await global.ReadCommand(); // wait for input by user first (I could use this for file streams!)
-        }
+        let input = await global.ReadCommand(); // wait for input by user first (I could use this for file streams!)
 
         global.inputState = InputState.Command;
         global.echo = false;
