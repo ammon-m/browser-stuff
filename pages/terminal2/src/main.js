@@ -26,7 +26,9 @@ globalThis.global = {
 
     inputListeners: Object.assign([], {
         addListener: (listener) => {
-            global.inputListeners.push({id: _inputListenerId++, callback: listener})
+            const li = {id: _inputListenerId++, callback: listener}
+            global.inputListeners.push(li)
+            return li;
         },
         removeListener: (listener) => {
             const idx = global.inputListeners.findIndex(value => {
