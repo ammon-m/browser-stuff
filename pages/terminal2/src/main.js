@@ -200,7 +200,18 @@ async function init(motd)
         {
             global.canType = false;
             global.inputListeners.invokeAll(input);
-            await receiveUserCommand(input);
+
+            try {
+                const arr = input.split(";;")
+                const echo = global.echo;
+                for(const val of arr)
+                {
+                    await receiveUserCommand(val);
+                    global.echo = false;
+                }
+                global.echo = true;
+            } catch {}
+
             global.canType = true;
             global.inputState = InputState.Command;
             ResetCursorBlink();
