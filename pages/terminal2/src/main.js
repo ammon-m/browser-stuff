@@ -401,6 +401,7 @@ async function receiveUserCommand(value)
     let commands = null
 
     if(global.inputState == InputState.Command)
+    {
         try
         {
             commands = parser.parse(value)
@@ -414,7 +415,9 @@ async function receiveUserCommand(value)
 
             return;
         }
-    y = terminal.GetEndPosition().y
+    }
+
+    let y = terminal.GetEndPosition().y
 
     if(commands == null)
     {
