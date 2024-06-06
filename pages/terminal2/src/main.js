@@ -1,9 +1,9 @@
 import Terminal from "./lib/Terminal.js";
-import { CommandParser } from "./lib/CommandParser.js"
-import Logger from "./lib/Logger.js"
-import ThemeColorSet from "./lib/ThemeColorSet.js"
+import CommandParser from "./lib/CommandParser.js";
+import Logger from "./lib/Logger.js";
+import ThemeColorSet from "./lib/ThemeColorSet.js";
 import Dictionary from "./lib/Dictionary.js";
-import * as minifs from "./lib/minifs.js"
+import * as minifs from "./lib/minifs.js";
 
 'use strict';
 

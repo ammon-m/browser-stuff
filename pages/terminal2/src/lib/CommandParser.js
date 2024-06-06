@@ -91,7 +91,7 @@ const commandsHelp =
     motd: "print the motd",
 }
 
-export class CommandParser
+export default class CommandParser
 {
     commands =
     {
