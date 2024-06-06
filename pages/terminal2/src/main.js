@@ -415,19 +415,27 @@ async function receiveUserCommand(value)
     }
     commandHistoryPos = commandHistory.length;
 
-    if(value == "") return;
+    let y = 0;
 
-    input = ""
-    cursorPos = 0
+    if(value == "")
+    {
+        y = terminal.GetEndPosition().y;
+        if(y - terminal._scroll > maxRows)
+            terminal.ScrollTo(y + 3/lineHeight - maxRows);
+        return;
+    }
 
-    const parser = new CommandParser()
-    let commands = null
+    input = "";
+    cursorPos = 0;
+
+    const parser = new CommandParser();
+    let commands = null;
 
     if(global.inputState == InputState.Command)
     {
         try
         {
-            commands = parser.parse(value)
+            commands = parser.parse(value);
         }
         catch(error)
         {
@@ -435,29 +443,28 @@ async function receiveUserCommand(value)
         }
     }
 
-    let y = terminal.GetEndPosition().y
-
     if(commands == null)
     {
+        y = terminal.GetEndPosition().y;
         if(y - terminal._scroll > maxRows)
-            terminal.ScrollTo(y + 3/lineHeight - maxRows)
+            terminal.ScrollTo(y + 3/lineHeight - maxRows);
         return;
     }
 
     try
     {
         for(const command of commands)
-            await command.execute()
+            await command.execute();
     }
     catch(error)
     {
-        error.name = "CommandExecutionError: " + error.name
-        logger.error(error)
+        error.name = "(CommandExecutionError) " + error.name;
+        logger.error(error);
     }
 
-    y = terminal.GetEndPosition().y
+    y = terminal.GetEndPosition().y;
     if(y - terminal._scroll > maxRows)
-        terminal.ScrollTo(y + 3/lineHeight - maxRows)
+        terminal.ScrollTo(y + 3/lineHeight - maxRows);
 }
 global.ExecuteTerminalCommand = receiveUserCommand;
 
