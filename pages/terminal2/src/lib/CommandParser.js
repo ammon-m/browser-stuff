@@ -99,9 +99,18 @@ export class CommandParser
             this.HelpCommandArgument(),
         ], commandsList.help),
 
-        echo: () => new Command("echo", [
-            this.Expression()
-        ], async (event) => {
+        // (() => {
+        //     const arr = [
+        //         new Token("string", (this.lexer.slice.startsWith(" ") ? this.lexer.slice.slice(1) : this.lexer.slice).match(/^[^;]*/)[0])
+        //     ];
+        //     while(this._lookAhead.type != ";" && this._lookAhead.type != "EoL")
+        //         this.eat("*");
+        //     return arr;
+        // })()
+
+        echo: () => new Command("echo",
+            this._lookAhead.type == "EoL" || this._lookAhead.type == ";" ? [new Token("string", "")] : [this.Expression()],
+        async (event) => {
             const val = await evaluate(event.parameters[0]);
             logger.log(val);
 
