@@ -109,7 +109,9 @@ export class CommandParser
         // })()
 
         echo: () => new Command("echo",
-            this._lookAhead.type == "EoL" || this._lookAhead.type == ";" ? [new Token("string", "")] : [this.Expression()],
+            this._lookAhead.type == "EoL" || this._lookAhead.type == ";"
+            ? [new Token("string", "")]
+            : [this.Expression()],
         async (event) => {
             const val = await evaluate(event.parameters[0]);
             logger.log(val);
@@ -194,10 +196,7 @@ export class CommandParser
         }),
 
         test: () => new Command("test", [], async (event) => {
-            const testValue =
-            `echo "these commands are synthetic user inputs!"
-            motd
-            help
+            const testValue = `echo "hello world!"
             echo "2 + 2 = " + (2 + 2)`
 
             global.echo = false;

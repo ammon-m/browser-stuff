@@ -124,10 +124,10 @@ contextMenuElement.style.left = "0";
 contextMenuElement.style.top = "0";
 
 const contextMenuItems = {
-    cCut:   (event) => { copy(event, true, true); contextMenuClose(); },
-    cCopy:  (event) => { copy(event, true); contextMenuClose(); },
-    cPaste: (event) => { paste(event, true); contextMenuClose(); },
-    dTest: (event) => {},
+    // aCut:   (input) => { copy(input, true, true); contextMenuClose(); },
+    aCopy:  (input) => { copy(input, true); contextMenuClose(); },
+    aPaste: (input) => { paste(input, true); contextMenuClose(); },
+    bClear: (input) => { contextMenuClose(); receiveUserCommand("clear") },
 }
 
 function contextMenuClose()
