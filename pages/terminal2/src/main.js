@@ -431,12 +431,7 @@ async function receiveUserCommand(value)
         }
         catch(error)
         {
-            logger.error(error)
-
-            error.name = "[Conch] " + error.name
-            console.error(error)
-
-            return;
+            logger.error(error);
         }
     }
 
@@ -456,11 +451,8 @@ async function receiveUserCommand(value)
     }
     catch(error)
     {
-        error.name += ": CommandExecutionError"
+        error.name = "CommandExecutionError: " + error.name
         logger.error(error)
-
-        error.name = "[Conch] " + error.name
-        console.error(error)
     }
 
     y = terminal.GetEndPosition().y
