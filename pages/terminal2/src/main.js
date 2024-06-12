@@ -595,18 +595,21 @@ function drawCanvas()
         }
     }
 
-    cursorCtx.fillStyle = theme.background
-    cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, 0, charWidth, cursorCtx.canvas.height)
+    if(terminal._rawText.length > 0)
+    {
+        cursorCtx.fillStyle = theme.background
+        cursorCtx.fillRect(cursorCtx.canvas.width - charWidth, 0, charWidth, cursorCtx.canvas.height)
 
-    const totalLines = terminal._rawText.split("\n").length;
+        const totalLines = terminal._rawText.split("\n").length;
 
-    cursorCtx.fillStyle = theme.foreground
-    cursorCtx.fillRect(
-        cursorCtx.canvas.width - charWidth,
-        (Math.floor(terminal._scroll) / (totalLines + maxRows)) * cursorCtx.canvas.height,
-        charWidth,
-        (maxRows / (totalLines + maxRows)) * cursorCtx.canvas.height
-    )
+        cursorCtx.fillStyle = theme.foreground
+        cursorCtx.fillRect(
+            cursorCtx.canvas.width - charWidth,
+            (Math.floor(terminal._scroll) / (totalLines + maxRows)) * cursorCtx.canvas.height,
+            charWidth,
+            (maxRows / (totalLines + maxRows)) * cursorCtx.canvas.height
+        )
+    }
 }
 
 init("hello world")
