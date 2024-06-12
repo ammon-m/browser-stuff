@@ -98,7 +98,7 @@ export default class Terminal
 
     ScrollTo(amount)
     {
-        this._scroll = Math.min(Math.max(amount, 0), this._rawText.split("\n").length - 1)
+        this._scroll = Math.min(Math.max(amount, 0), this._rawText.split("\n").length)
         this.Redraw();
     }
 
