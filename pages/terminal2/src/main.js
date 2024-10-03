@@ -49,13 +49,18 @@ globalThis.global = {
         },
     }),
 
-    printMotd: () => {
-        terminal.WriteLine("Welcome to ");
-        terminal.SetBold(true);
-        terminal.Write("Conch");
-        terminal.SetBold(false);
-        terminal.Write(` [v${VERSION}]`);
-        terminal.WriteLine(`An experimental browser-based shell\n`);
+    printMotd: (echo = true) => {
+        if(echo)
+        {
+            terminal.WriteLine("Welcome to ");
+            terminal.SetBold(true);
+            terminal.Write("Conch");
+            terminal.SetBold(false);
+            terminal.Write(` [v${VERSION}]`);
+            terminal.WriteLine(`An experimental browser-based shell\n`);
+        }
+
+        return `Welcome to Conch [v${VERSION}]\nAn experimental browser-based shell`;
     },
 
     /**@param {string} value */

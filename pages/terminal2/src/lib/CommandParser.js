@@ -3,9 +3,12 @@ class CommandExecutionEvent
     /**@type {Token[]} */
     parameters = []
 
-    constructor(parameters)
+    piping = false;
+
+    constructor(parameters, piping = false)
     {
-        this.parameters = parameters
+        this.parameters = parameters;
+        this.piping = (piping && true);
     }
 }
 
@@ -27,9 +30,9 @@ class Command
         this.callback = callback
     }
 
-    async execute()
+    async execute(piping = false)
     {
-        return await this.callback(new CommandExecutionEvent(this.parameters))
+        return await this.callback(new CommandExecutionEvent(this.parameters, piping))
     }
 }
 
@@ -41,14 +44,15 @@ const commandsList =
         let str = ""
         if(cmd.type == "EoL")
             str = ("List of all available commands:\n  " + (Object.keys(commandsList).join("\n  "))
-            + "\n\nUse help <command> to learn more about a specific command\n")
+            + "\n\nUse help <command> to learn more about a specific command")
         else if(!commandsList.hasOwnProperty(cmd.value))
-            throw new SyntaxError(`Unknown command '${cmd.value}'\n`)
+            throw new SyntaxError(`Unknown command '${cmd.value}'`)
         else if(!commandsHelp.hasOwnProperty(cmd.value))
-            str = ("[no documentation]\n")
-        else str = (commandsHelp[cmd.value] + "\n")
+            str = ("[no documentation]")
+        else str = (commandsHelp[cmd.value])
 
-        logger.log(str);
+        if(!event.piping)
+            logger.log(str + "\n");
         return str
     },
 
@@ -58,7 +62,7 @@ const commandsList =
     clear: async (event) => {
         logger.clear()
         if(event.parameters[0] === undefined) return;
-        if(event.parameters[0].value == "m" || event.parameters[0].value == "M")
+        if(event.parameters[0].value.toLowerCase() == "m")
         {
             let echo = global.echo
             global.echo = false;
@@ -114,8 +118,9 @@ export default class CommandParser
             : [this.Expression()],
         async (event) => {
             const val = await evaluate(event.parameters[0]);
-            logger.log(val);
 
+            if(!event.piping)
+                logger.log(val);
             return val;
         }),
 
@@ -156,43 +161,54 @@ export default class CommandParser
                     let label = "name";
                     let longest = 16;
 
-                    for(const key of Object.keys(global.stack._keyvalues))
+                    if(!event.piping)
                     {
-                        if(longest < key.length + 4)
-                            longest = key.length + 4;
+                        for(const key of Object.keys(global.stack._keyvalues))
+                        {
+                            if(longest < key.length + 4)
+                                longest = key.length + 4;
+                        }
+
+                        for(let i = 0; i < longest - 4; i++)
+                            label += " ";
+                        label += "value";
+
+                        logger.log(label);
                     }
 
-                    for(var i = 0; i < longest - 4; i++)
-                        label += " ";
-                    label += "value";
-
-                    logger.log(label);
-
+                    let list = [];
                     for(const key of Object.keys(global.stack._keyvalues))
                     {
-                        let str = "- " + key;
-                        for(var i = 0; i < longest - key.length; i++)
-                            str += " ";
-                        str += global.stack.Get(key).toString();
+                        if(event.piping)
+                            list.push(`${key}=${global.stack.Get(key).toString()}`)
+                        else
+                        {
+                            let str = "- " + key;
+                            for(let i = 0; i < longest - key.length; i++)
+                                str += " ";
+                            str += global.stack.Get(key).toString();
 
-                        logger.log(str);
+                            logger.log(str);
+                        }
                     }
 
-                    logger.log("");
+                    if(!event.piping)
+                        logger.log("");
+                    else
+                        return list.join("&");
 
                     return;
                 }
                 case "flush":
                 {
-                    global.stack.Clear();
-                    return;
+                    return global.stack.Clear();
                 }
             }
             throw new SyntaxError("First argument must be one of: set, get, list, or flush\n");
         }),
 
         motd: () => new Command("motd", [], async (event) => {
-            global.printMotd();
+            return global.printMotd(!event.piping);
         }),
 
         test: () => new Command("test", [], async (event) => {
@@ -226,6 +242,8 @@ export default class CommandParser
             await this.ask("u sure?", async () => {
                 const out = await (await fetch(ROOTPATH + "/LICENSE")).text()
                 ret = out;
+
+                if(!event.piping)
                 for(const line of out.split(/\r?\n/g))
                 {
                     await global.ExecuteTerminalCommand('echo "' + line.replaceAll("\"", "\\\"") + '"');
@@ -239,8 +257,8 @@ export default class CommandParser
     /**
      * halt execution until user confirms a yes or no question
      * @param {string} question
-     * @param {async () => {}} yes
-     * @param {async () => {}} no
+     * @param {Promise<void>} yes
+     * @param {Promise<void>} no
      * 
      * @returns {Promise<string>} `y` or `n`
      */
@@ -282,6 +300,9 @@ export default class CommandParser
 
     /**
      * Throws {@linkcode SyntaxError} if the command fails at any point.
+     * 
+     * @param {string} string
+     * 
      * @returns {Command[]}
      */
     parse(string)
@@ -323,7 +344,7 @@ export default class CommandParser
         switch(this._lookAhead.type)
         {
             case "word": {
-                let name = this.Word();
+                const name = this.Word();
                 if(this.commands.hasOwnProperty(name.value)) return this.commands[name.value]();
 
                 switch(this._lookAhead.type)
@@ -337,11 +358,21 @@ export default class CommandParser
 
                         return new Command("", [],
                             async () => {
-                                global.stack.Set(name.value, await evaluate(value));
-                                return value;
+                                const equatedValue = await evaluate(value);
+                                global.stack.Set(name.value, equatedValue);
+                                return equatedValue;
                             },
                         );
                     }
+                    default:
+                        throw new SyntaxError(`Unknown command: ${name.value}\ntry using the help command to see get help\n`);
+                }
+            }
+            case "$": {
+                const name = this.Variable();
+
+                switch(this._lookAhead.type)
+                {
                     case "additiveOperator":
                         const token = this.eat(this._lookAhead.type);
                         if(this._lookAhead.type == "additiveOperator" && this._lookAhead.value == token.value)
@@ -350,45 +381,65 @@ export default class CommandParser
                             const value = {
                                 type: "BinaryExpression",
                                 operator: token.value,
-                                left: {
-                                    type: "variable",
-                                    value: name.value,
-                                },
+                                left: name,
                                 right: {
                                     type: "number",
                                     value: 1
                                 },
                             };
-    
+
                             return new Command("", [],
                                 async () => {
+                                    const oldValue = global.stack.Get(name.value);
                                     global.stack.Set(name.value, await evaluate(value));
-                                    return value;
+                                    return oldValue;
                                 },
                             );
                         }
-                    case "multiplicativeOperator": {
+                    // falls through
+                    case "multiplicativeOperator":
+                    case "bitwiseOperator": {
                         this.eat("=");
                         const value = {
                             type: "BinaryExpression",
                             operator: token.value,
-                            left: {
-                                type: "variable",
-                                value: name.value,
-                            },
+                            left: name,
                             right: this.Expression(),
                         };
 
                         return new Command("", [],
                             async () => {
-                                global.stack.Set(name.value, await evaluate(value));
-                                return value;
+                                const equatedValue = await evaluate(value);
+                                global.stack.Set(name.value, equatedValue);
+                                return equatedValue;
                             },
                         );
                     }
-                    default:
-                        throw new SyntaxError(`Unknown command: ${name.value}\ntry using the help command to see get help\n`);
                 }
+            }
+            case "additiveOperator": {
+                const token = this.eat(this._lookAhead.type);
+                this.eat(token.type);
+
+                const name = this.Variable();
+
+                const value = {
+                    type: "BinaryExpression",
+                    operator: token.value,
+                    left: name,
+                    right: {
+                        type: "number",
+                        value: 1
+                    },
+                };
+
+                return new Command("", [],
+                    async () => {
+                        const equatedValue = await evaluate(value);
+                        global.stack.Set(name.value, equatedValue);
+                        return equatedValue;
+                    },
+                );
             }
         }
 
@@ -477,7 +528,7 @@ try using the help command to see get help
         switch(this._lookAhead.type)
         {
             case "(": return this.ParenthesizedExpression();
-            default: return this.Equatable();
+            default: return this.UnaryExpression();
         }
     }
 
@@ -496,7 +547,12 @@ try using the help command to see get help
 
     MultiplicativeExpression()
     {
-        return this._BinaryExpression("PrimaryExpression", "multiplicativeOperator");
+        return this._BinaryExpression("BitwiseExpression", "multiplicativeOperator");
+    }
+
+    BitwiseExpression()
+    {
+        return this._BinaryExpression("PrimaryExpression", "bitwiseOperator");
     }
 
     _BinaryExpression(name, type)
@@ -520,6 +576,43 @@ try using the help command to see get help
         return left;
     }
 
+    UnaryExpression()
+    {
+        const checkBefore = ["-", "--", "++", "~", "!"];
+        const checkAfter = ["--", "++"];
+        if(this._lookAhead.type == "unaryOperator" && checkBefore.contains(this._lookAhead.value))
+        {
+            const operator = this.eat("unaryOperator").value;
+
+            const value = this.Variable();
+
+            return {
+                type: "UnaryExpression",
+                operator,
+                value,
+                before: true
+            };
+        }
+        else if(this._lookAhead.type == "$")
+        {
+            const value = this.Variable();
+
+            if(this._lookAhead.type == "unaryOperator" && checkAfter.contains(this._lookAhead.value))
+            {
+                const operator = this.eat("unaryOperator").value;
+
+                return {
+                    type: "UnaryExpression",
+                    operator,
+                    value,
+                    before: false
+                };
+            }
+            else return value;
+        }
+        else return this.Equatable();
+    }
+
     Variable()
     {
         this.eat("$");
@@ -533,7 +626,7 @@ try using the help command to see get help
                 token = this.eat("word");
                 break;
             default:
-                throw new SyntaxError(`Unexpected ${this._lookAhead.type} \`${this._lookAhead.value}\`, expected word\n`);
+                throw new SyntaxError(`Unexpected ${this._lookAhead.type} \`${this._lookAhead.value}\`, expected variable\n`);
         }
         return {
             type: "variable",
@@ -603,9 +696,49 @@ async function evaluate(expression)
                 case "-": return await evaluate(expression.left) - await evaluate(expression.right);
                 case "*": return await evaluate(expression.left) * await evaluate(expression.right);
                 case "/": return await evaluate(expression.left) / await evaluate(expression.right);
+                case "|": return await evaluate(expression.left) | await evaluate(expression.right);
+                case "&": return await evaluate(expression.left) & await evaluate(expression.right);
+                case "^": return await evaluate(expression.left) ^ await evaluate(expression.right);
+                case "<<": return await evaluate(expression.left) << await evaluate(expression.right);
+                case ">>": return await evaluate(expression.left) >> await evaluate(expression.right);
+            }
+        case "UnaryExpression":
+            switch(expression.operator)
+            {
+                case "-": return -await evaluate(expression.value);
+                case "~": return ~await evaluate(expression.value);
+                case "!": return !await evaluate(expression.value);
+                case "--": {
+                    if(expression.after)
+                    {
+                        const ret = await evaluate(expression.value);
+                        global.stack.Set(expression.value, ret - 1);
+                        return ret;
+                    }
+                    else
+                    {
+                        const ret = await evaluate(expression.value) - 1;
+                        global.stack.Set(expression.value, ret);
+                        return ret;
+                    }
+                }
+                case "++": {
+                    if(expression.after)
+                    {
+                        const ret = await evaluate(expression.value);
+                        global.stack.Set(expression.value, ret + 1);
+                        return ret;
+                    }
+                    else
+                    {
+                        const ret = await evaluate(expression.value) + 1;
+                        global.stack.Set(expression.value, ret);
+                        return ret;
+                    }
+                }
             }
         case "command":
-            return await expression.execute();
+            return await expression.execute(true);
         case "number":
             return Number(expression.value);
         case "variable":
@@ -637,13 +770,15 @@ const tokenTypes = Object.freeze({
     ".": /^\./,
     "?": /^\?/,
     "$": /^\$/,
-    pipe: /^\|/,
+    pipe: /^\|(?=\s*\w)/,
+    number: /^(-?\d+(?:\.\d+)?)/,
+    unaryOperator: /^(--|-(?=\S)|++|~|!)/,
     additiveOperator: /^(\+|-)/,
     multiplicativeOperator: /^(\*|\/)/,
+    bitwiseOperator: /^(\&|\||\^|\<\<|\>\>)/,
     // path: /^([^\/\t]+(\/[^\/\t]+)*((\.[a-zA-Z0-9]+)|\/))/,
-    number: /^(\d+(?:\.\d+)?)/,
-    word: /^[a-zA-Z_][a-zA-Z_0-9]*/,
     boolean: /^(true|false)/,
+    word: /^[a-zA-Z_][a-zA-Z_0-9]*/,
     EoL: /^\s*$/,
 })
 

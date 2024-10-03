@@ -12,7 +12,7 @@ export default class Dictionary
 
     Set(key, value)
     {
-        if(value !== "")
+        if(value !== "" && value !== null && value !== undefined)
             this._keyvalues[key] = value;
         else
             Reflect.deleteProperty(this._keyvalues, key);
@@ -27,9 +27,11 @@ export default class Dictionary
     Clear()
     {
         const keys = Object.keys(this._keyvalues);
+        let result = 0;
         for(const key of keys)
         {
-            Reflect.deleteProperty(this._keyvalues, key);
+            result |= Reflect.deleteProperty(this._keyvalues, key);
         }
+        return (result && true);
     }
 }
