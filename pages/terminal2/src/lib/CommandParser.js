@@ -690,13 +690,13 @@ async function evaluate(expression)
                     if(expression.after)
                     {
                         const ret = await evaluate(expression.value);
-                        global.stack.Set(expression.value, ret - 1);
+                        global.stack.Set(expression.value.value, ret - 1);
                         return ret;
                     }
                     else
                     {
                         const ret = await evaluate(expression.value) - 1;
-                        global.stack.Set(expression.value, ret);
+                        global.stack.Set(expression.value.value, ret);
                         return ret;
                     }
                 }
@@ -704,13 +704,13 @@ async function evaluate(expression)
                     if(expression.after)
                     {
                         const ret = await evaluate(expression.value);
-                        global.stack.Set(expression.value, ret + 1);
+                        global.stack.Set(expression.value.value, ret + 1);
                         return ret;
                     }
                     else
                     {
                         const ret = await evaluate(expression.value) + 1;
-                        global.stack.Set(expression.value, ret);
+                        global.stack.Set(expression.value.value, ret);
                         return ret;
                     }
                 }
