@@ -373,33 +373,28 @@ export default class CommandParser
 
                 switch(this._lookAhead.type)
                 {
-                    case "additiveOperator":
-                        const token = this.eat(this._lookAhead.type);
-                        if(this._lookAhead.type == "additiveOperator" && this._lookAhead.value == token.value)
-                        {
-                            this.eat(token.type);
-                            const value = {
-                                type: "BinaryExpression",
-                                operator: token.value,
-                                left: name,
-                                right: {
-                                    type: "number",
-                                    value: 1
-                                },
-                            };
+                    case "unaryOperator": {
+                        const token = this.eat("unaryOperator");
 
-                            return new Command("", [],
-                                async () => {
-                                    const oldValue = global.stack.Get(name.value);
-                                    global.stack.Set(name.value, await evaluate(value));
-                                    return oldValue;
-                                },
-                            );
-                        }
-                    // falls through
+                        const value = {
+                            type: "UnaryExpression",
+                            value: name,
+                            operator: token.value,
+                            before: false,
+                        };
+
+                        return new Command("", [],
+                            async () => {
+                                return await evaluate(value);
+                            },
+                        );
+                    }
+                    case "additiveOperator":
                     case "multiplicativeOperator":
                     case "bitwiseOperator": {
+                        const token = this.eat(this._lookAhead.type);
                         this.eat("=");
+
                         const value = {
                             type: "BinaryExpression",
                             operator: token.value,
@@ -417,27 +412,10 @@ export default class CommandParser
                     }
                 }
             }
-            case "additiveOperator": {
-                const token = this.eat(this._lookAhead.type);
-                this.eat(token.type);
-
-                const name = this.Variable();
-
-                const value = {
-                    type: "BinaryExpression",
-                    operator: token.value,
-                    left: name,
-                    right: {
-                        type: "number",
-                        value: 1
-                    },
-                };
-
+            case "unaryOperator": {
                 return new Command("", [],
                     async () => {
-                        const equatedValue = await evaluate(value);
-                        global.stack.Set(name.value, equatedValue);
-                        return equatedValue;
+                        return await evaluate(this.UnaryExpression());
                     },
                 );
             }
