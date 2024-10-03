@@ -558,7 +558,7 @@ try using the help command to see get help
     {
         const checkBefore = ["-", "--", "++", "~", "!"];
         const checkAfter = ["--", "++"];
-        if(this._lookAhead.type == "unaryOperator" && checkBefore.contains(this._lookAhead.value))
+        if(this._lookAhead.type == "unaryOperator" && checkBefore.includes(this._lookAhead.value))
         {
             const operator = this.eat("unaryOperator").value;
 
@@ -575,7 +575,7 @@ try using the help command to see get help
         {
             const value = this.Variable();
 
-            if(this._lookAhead.type == "unaryOperator" && checkAfter.contains(this._lookAhead.value))
+            if(this._lookAhead.type == "unaryOperator" && checkAfter.includes(this._lookAhead.value))
             {
                 const operator = this.eat("unaryOperator").value;
 
