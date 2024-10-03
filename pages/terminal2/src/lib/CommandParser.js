@@ -772,7 +772,7 @@ const tokenTypes = Object.freeze({
     "$": /^\$/,
     pipe: /^\|(?=\s*\w)/,
     number: /^(-?\d+(?:\.\d+)?)/,
-    unaryOperator: /^(--|-(?=\S)|++|~|!)/,
+    unaryOperator: /^(--|-(?=\S)|\+\+|\~|\!)/,
     additiveOperator: /^(\+|-)/,
     multiplicativeOperator: /^(\*|\/)/,
     bitwiseOperator: /^(\&|\||\^|\<\<|\>\>)/,
