@@ -473,9 +473,16 @@ try using the help command to see get help
     {
         if(this._lookAhead.type == "pipe")
         {
-            this.eat("pipe");
-            if(this._lookAhead.type == "word")
-                return this.Command();
+            const token = this.eat("pipe");
+            if(token.value == "|")
+            {
+                if(this._lookAhead.type == "word")
+                    return this.Command();
+            }
+            else if(token.value == ">")
+            {
+                throw new Error("The filesystem has not been implemented yet");
+            }
         }
         return this.Literal();
     }
@@ -748,7 +755,7 @@ const tokenTypes = Object.freeze({
     ".": /^\./,
     "?": /^\?/,
     "$": /^\$/,
-    pipe: /^\|(?=\s*\w)/,
+    pipe: /^(\||\>)(?=\s*\w)/,
     number: /^(-?\d+(?:\.\d+)?)/,
     unaryOperator: /^(--|-(?=\S)|\+\+|\~|\!)/,
     additiveOperator: /^(\+|-)/,
