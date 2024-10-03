@@ -58,7 +58,8 @@ globalThis.global = {
         terminal.WriteLine(`An experimental browser-based shell\n`);
     },
 
-    ExecuteTerminalCommand: async () => {},
+    /**@param {string} value */
+    ExecuteTerminalCommand: async (value) => {},
 
     /**
      * @returns {Promise<string>}

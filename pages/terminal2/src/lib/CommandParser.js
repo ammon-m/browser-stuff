@@ -442,8 +442,12 @@ try using the help command to see get help
 
     Equatable()
     {
-        if(this._lookAhead.type == "word" && this.commands.hasOwnProperty(this._lookAhead.value))
-            return this.Command();
+        if(this._lookAhead.type == "pipe")
+        {
+            this.eat("pipe");
+            if(this._lookAhead.type == "word")
+                return this.Command();
+        }
         return this.Literal();
     }
 
@@ -633,7 +637,7 @@ const tokenTypes = Object.freeze({
     ".": /^\./,
     "?": /^\?/,
     "$": /^\$/,
-    "|": /^\|/,
+    pipe: /^\|/,
     additiveOperator: /^(\+|-)/,
     multiplicativeOperator: /^(\*|\/)/,
     // path: /^([^\/\t]+(\/[^\/\t]+)*((\.[a-zA-Z0-9]+)|\/))/,
