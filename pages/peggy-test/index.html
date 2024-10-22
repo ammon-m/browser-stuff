@@ -1,5 +1,14 @@
 <head>
-    <script type="module" src="./test.js"></script>
+    <script type="module">
+        import * as peggy from "./parser.mjs";
+
+        function reparse()
+        {
+            document.getElementById("output").innerText = JSON.stringify(peggy.parse(
+                document.getElementById("input").innerText
+            ));
+        }
+    </script>
 </head>
 <body>
     <pre id="input" contenteditable="true"></pre>
