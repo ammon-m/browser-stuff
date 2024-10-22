@@ -1,8 +1,3 @@
-// Simple Arithmetics Grammar
-// ==========================
-//
-// Accepts expressions like "* 2 + 3 4" and computes their value.
-
 Root
   = (_ @(Block / Statement / If))+
 
