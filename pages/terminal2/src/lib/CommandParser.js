@@ -126,7 +126,7 @@ export default class CommandParser
 
         clear: () => new Command("clear",
             this._lookAhead.value == "-" ? (() => {
-                this.eat("additiveOperator");
+                this.eat("unaryOperator");
                 return [this.Word()];
             })() : [],
         commandsList.clear),
