@@ -74,10 +74,11 @@ const commandsList =
     /** @param {CommandExecutionEvent} event */
     user: async (event) => {
         if(event.parameters[0].value == "")
-            throw new SyntaxError("First argument of user cannot be empty\n")
+            throw new SyntaxError("First argument of user cannot be empty\n");
         else if(global.user != event.parameters[0].value)
         {
-            global.user = event.parameters[0].value
+            global.user = event.parameters[0].value;
+            global.env.Set("HOME", "/home/" + global.user);
         }
     },
 
@@ -94,6 +95,8 @@ const commandsHelp =
     stack: "provides basic functionality that allows the user to read and write to the variable stack",
     motd: "print the motd",
 }
+
+const rootUrl = new URL("https://example.com/");
 
 export default class CommandParser
 {
@@ -241,6 +244,44 @@ export default class CommandParser
                 }
             );
         }),
+
+        cd: () => new Command(
+            "cd",
+            (this._lookAhead.type == "EoL" || this._lookAhead.type == ";")
+                ? [new Token("string", "~")]
+                : [this.String()],
+            async (event) => {
+                let str = event.parameters[0].value;
+
+                if(str.length == 0)
+                {
+                    global.cwd = "~";
+                    return;
+                }
+
+                const HOME = global.env.Get("HOME");
+                let cwd = global.cwd;
+
+                if(str === ".") return;
+                if(str === cwd) return;
+
+                if(str[0] === "~")
+                {
+                    str = HOME + str.substring(1);
+                }
+                if(cwd[0] === "~")
+                {
+                    cwd = HOME + cwd.substring(1);
+                }
+
+                let path = new URL(str, new URL(cwd, rootUrl)).pathname;
+                if(path.substring(0, HOME.length) === HOME)
+                {
+                    path = "~" + path.substring(HOME.length);
+                }
+                global.cwd = path;
+            }
+        ),
 
         license: () => new Command("license", [], async (event) => {
             let ret = "";

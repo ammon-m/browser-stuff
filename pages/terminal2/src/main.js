@@ -26,6 +26,8 @@ globalThis.global = {
 
     inputState: InputState.Command,
 
+    env: new Dictionary(),
+
     inputListeners: Object.assign([], {
         addListener: (listener) => {
             const li = {id: _inputListenerId++, callback: listener}
@@ -171,6 +173,8 @@ async function init(motd)
     {
         console.log(motd)
     }
+
+    global.env.Set("HOME", "/home/" + global.user);
 
     let _prefix = Object.keys(contextMenuItems)[0][0];
     for(const key of Object.keys(contextMenuItems))

@@ -15,7 +15,11 @@ export default class Dictionary
         if(value !== "" && value !== null && value !== undefined)
             this._keyvalues[key] = value;
         else
+        {
+            this._keyvalues[key] = undefined;
+            delete this._keyvalues[key];
             Reflect.deleteProperty(this._keyvalues, key);
+        }
     }
 
     Get(key)
