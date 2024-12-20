@@ -509,7 +509,8 @@ try using the help command to see get help
 
     StringNoQuotes()
     {
-        const value = /\S+/.exec(this.lexer.slice)[0];
+        const match = /\S+/.exec(this.lexer.slice);
+        let value = this._lookAhead.value + (match ? match[0] : "");
         this.lexer.advance(value.length);
         this._lookAhead = this.lexer.nextToken();
         return {
