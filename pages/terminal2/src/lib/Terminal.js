@@ -32,6 +32,7 @@ export default class Terminal
     {
         this.ctx = ctx
         this.SetColor(Terminal.Colors.foreground)
+        this.SetBackgroundColor(Terminal.Colors.background)
     }
 
     _addSymbol(string)
@@ -42,7 +43,15 @@ export default class Terminal
         let split = string.split(/(?=\n)/)
         for(var i = 0; i < split.length; i++)
         {
-            this._textSymbols.push(new TextSymbol(split[i], this.GetColor(), this.GetBold(), this.GetItalic()));
+            this._textSymbols.push(
+                new TextSymbol(
+                    split[i],
+                    this.GetColor(),
+                    this.GetBackgroundColor(),
+                    this.GetBold(),
+                    this.GetItalic()
+                )
+            );
         }
     }
 
@@ -58,17 +67,33 @@ export default class Terminal
 
     GetColor()
     {
-        return this._drawingState.color
+        return this._drawingState.fgColor
     }
 
     SetColor(colorCssString)
     {
-        this._drawingState.color = colorCssString;
+        this._drawingState.fgColor = colorCssString;
     }
 
     ResetColor()
     {
-        this._drawingState.color = Terminal.Colors.foreground;
+        this._drawingState.fgColor = Terminal.Colors.foreground;
+        ResetBackgroundColor();
+    }
+
+    GetBackgroundColor()
+    {
+        return this._drawingState.bgColor
+    }
+
+    SetBackgroundColor(colorCssString)
+    {
+        this._drawingState.bgColor = colorCssString;
+    }
+
+    ResetBackgroundColor()
+    {
+        this._drawingState.bgColor = Terminal.Colors.background;
     }
 
     GetBold()
@@ -163,8 +188,8 @@ export default class Terminal
 
     Redraw()
     {
-        this.ctx.fillStyle = Terminal.Colors.background
-        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+        this.ctx.fillStyle = Terminal.Colors.background;
+        this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
         let x = 0;
         let y = 1 - 3/this.lineHeight;
@@ -185,16 +210,20 @@ export default class Terminal
             str = str.replace("\n", "");
 
             this.ctx.font = (symbol.Italic ? "italic " : "") + (symbol.Bold ? "bold " : "") + ogFont;
-            this.ctx.fillStyle = symbol.Color;
-            this.ctx.fillText(str, x * this.charWidth + this.xPadding, (y - this._scroll) * this.lineHeight)
 
-            x += str.length
+            this.ctx.fillStyle = symbol.BgColor;
+            this.ctx.fillRect(x * this.charWidth + this.xPadding, (y - this._scroll) * this.lineHeight, str.length * this.charWidth, this.lineHeight);
+
+            this.ctx.fillStyle = symbol.FgColor;
+            this.ctx.fillText(str, x * this.charWidth + this.xPadding, (y - this._scroll) * this.lineHeight);
+
+            x += str.length;
         })
 
         this.ctx.font = ogFont;
         this.ctx.fillStyle = ogColor;
 
-        this.onRedraw()
+        this.onRedraw();
     }
 
     onRedraw = () => {}
@@ -234,14 +263,16 @@ export default class Terminal
 class TextSymbol
 {
     Value;
-    Color;
+    FgColor;
+    BgColor;
     Bold;
     Italic;
 
-    constructor(string = "", color = "#ffffff", bold = false, italic = false)
+    constructor(string = "", fgColor = "#ffffff", bgColor = "#000000", bold = false, italic = false)
     {
         this.Value = string
-        this.Color = color
+        this.FgColor = fgColor
+        this.BgColor = bgColor
         this.Bold = bold
         this.Italic = italic
     }
@@ -254,7 +285,8 @@ class TextSymbol
 
 class DrawingState
 {
-    color = "#ffffff"
+    fgColor = "#ffffff"
+    bgColor = "#000000"
     bold = false
     italic = false
 }

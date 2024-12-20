@@ -36,4 +36,6 @@ interface LogEntry extends IArguments
 {
     type: string
     message: string
+    fgColor: string
+    bgColor: string
 }

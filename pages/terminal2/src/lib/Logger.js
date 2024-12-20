@@ -32,10 +32,16 @@ export default class Logger
 
             this.lines.push(str)
 
+            /**@type {import("./Logger.js").LogEntry} */
             const entry = {
                 type: _type,
-                message: str
+                message: str,
+                fgColor: "foreground",
+                bgColor: "background"
             }
+
+            if(_type === "Error") entry.fgColor = "red";
+            if(_type === "Warning") entry.fgColor = "yellow";
 
             this.entries.push(entry)
             arr.push(entry)

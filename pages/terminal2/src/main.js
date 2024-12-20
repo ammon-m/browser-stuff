@@ -311,8 +311,8 @@ async function init(motd)
     });
 
     mainElement.addEventListener("contextmenu", event => {
-        contextMenuElement.style.left = event.clientX + "px";
-        contextMenuElement.style.top = event.clientY + "px";
+        contextMenuElement.style.left = event.clientX - 8 + "px";
+        contextMenuElement.style.top = event.clientY - 10 + "px";
         contextMenuElement.classList.remove("hidden");
         consoleFocused = false;
         unfocusable = false;
@@ -530,9 +530,7 @@ function renderOutput(entries)
     {
         const ln = entries[i]
 
-        terminal.SetColor(global.theme.foreground)
-        if(ln.type == "Warning") terminal.SetColor(global.theme.warning)
-        if(ln.type == "Error") terminal.SetColor(global.theme.error)
+        terminal.SetColor(global.theme[ln.fgColor])
 
         terminal.WriteLine(ln.message)
     }
