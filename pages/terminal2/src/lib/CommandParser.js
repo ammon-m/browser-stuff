@@ -249,7 +249,7 @@ export default class CommandParser
             "cd",
             (this._lookAhead.type == "EoL" || this._lookAhead.type == ";")
                 ? [new Token("string", "")]
-                : [this.String()],
+                : [this.StringNoQuotes()],
             async (event) => {
                 let str = event.parameters[0].value;
 
@@ -499,11 +499,19 @@ try using the help command to see get help
 
     String()
     {
-        const token = this.eat('string word stringNoQuotes')
+        const token = this.eat('string word')
         const string = token.value.startsWith('"')
         return {
             type: "string",
             value: string ? token.value.slice(1, token.value.length - 1).replaceAll("\\\"", "\"") : token.value
+        }
+    }
+
+    StringNoQuotes()
+    {
+        return {
+            type: "string",
+            value: /\S+/.exec(this.lexer.slice)[0],
         }
     }
 
@@ -816,7 +824,6 @@ const tokenTypes = Object.freeze({
     boolean: /^(true|false)/,
     word: /^[a-zA-Z_][a-zA-Z_0-9]*/,
     EoL: /^\s*$/,
-    stringNoQuotes: /\S+/,
 })
 
 class Lexer
