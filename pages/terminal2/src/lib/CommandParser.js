@@ -274,7 +274,12 @@ export default class CommandParser
                     cwd = HOME + cwd.substring(1);
                 }
 
-                let path = new URL(str + "/", new URL(cwd, rootUrl)).pathname;
+                if(str.length > 1 && str.charAt(str.length - 1) !== "/")
+                {
+                    str += "/"
+                }
+
+                let path = new URL(str, new URL(cwd, rootUrl)).pathname;
                 if(path.substring(0, HOME.length) === HOME)
                 {
                     path = "~" + path.substring(HOME.length);
