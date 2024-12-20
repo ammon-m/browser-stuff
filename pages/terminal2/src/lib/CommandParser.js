@@ -223,15 +223,21 @@ export default class CommandParser
             global.echo = true;
         }),
 
-        maybe: () => new Command("maybe", [], async (event) => {
+        yn: () => new Command("yn", [], async (event) => {
             return await this.ask("example question",
                 async () => {
-                    await global.ExecuteTerminalCommand('echo "user said yes"');
-                    await global.ExecuteTerminalCommand('echo "yay!!!"');
+                    if(!event.piping)
+                    {
+                        await global.ExecuteTerminalCommand('echo "user said yes"');
+                        await global.ExecuteTerminalCommand('echo "yay!!!"');
+                    }
                 },
                 async () => {
-                    await global.ExecuteTerminalCommand('echo "user said no"');
-                    await global.ExecuteTerminalCommand('echo "man...."');
+                    if(!event.piping)
+                    {
+                        await global.ExecuteTerminalCommand('echo "user said no"');
+                        await global.ExecuteTerminalCommand('echo "man...."');
+                    }
                 }
             );
         }),
