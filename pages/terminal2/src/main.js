@@ -322,7 +322,11 @@ async function init(motd)
         unfocusable = false;
         drawCanvas();
         event.preventDefault();
-    }, false)
+    }, false);
+
+    contextMenuElement.addEventListener("contextmenu", event => {
+        event.preventDefault();
+    });
 
     window.addEventListener("mousedown", event => {
         if(!(consoleFocused ^ unfocusable))
