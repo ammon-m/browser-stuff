@@ -279,7 +279,8 @@ export default class CommandParser
                     str += "/"
                 }
 
-                let path = new URL(str, new URL(cwd, rootUrl)).pathname;
+                let path = decodeURI(new URL(str, new URL(cwd, rootUrl)).pathname);
+
                 if(path.substring(0, HOME.length) === HOME)
                 {
                     path = "~" + path.substring(HOME.length);
@@ -509,6 +510,11 @@ try using the help command to see get help
 
     StringNoQuotes()
     {
+        if(this._lookAhead.type == "string")
+        {
+            return this.String();
+        }
+
         const match = /\S+/.exec(this.lexer.slice);
         let value = this._lookAhead.value + (match ? match[0] : "");
         this.lexer.advance(value.length);
