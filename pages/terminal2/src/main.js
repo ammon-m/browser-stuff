@@ -312,7 +312,7 @@ async function init(motd)
 
     mainElement.addEventListener("contextmenu", event => {
         contextMenuElement.style.left = event.clientX + "px";
-        contextMenuElement.style.top = event.clientY - lineHeight + "px";
+        contextMenuElement.style.top = event.clientY + "px";
         contextMenuElement.classList.remove("hidden");
         consoleFocused = false;
         unfocusable = false;
