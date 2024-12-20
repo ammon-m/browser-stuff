@@ -571,9 +571,11 @@ function drawCanvas()
             cursorCtx.fillText(":", x * charWidth + xPadding, y * lineHeight);
             x++
 
+            let path = global.cwd;
+            if(path.length > 1 && path[path.length - 1] === "/") path = path.substring(0, path.length - 1);
             cursorCtx.fillStyle = theme.path;
-            cursorCtx.fillText(global.cwd, x * charWidth + xPadding, y * lineHeight);
-            x += global.cwd.length
+            cursorCtx.fillText(path, x * charWidth + xPadding, y * lineHeight);
+            x += path.length
 
             cursorCtx.fillStyle = theme.foreground;
             cursorCtx.fillText("$ ", x * charWidth + xPadding, y * lineHeight);
