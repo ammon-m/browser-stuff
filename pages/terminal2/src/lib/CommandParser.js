@@ -509,10 +509,13 @@ try using the help command to see get help
 
     StringNoQuotes()
     {
+        const value = /\S+/.exec(this.lexer.slice)[0];
+        this.lexer.advance(value.length);
+        this._lookAhead = this.lexer.nextToken();
         return {
             type: "string",
-            value: /\S+/.exec(this.lexer.slice)[0],
-        }
+            value,
+        };
     }
 
     End()
