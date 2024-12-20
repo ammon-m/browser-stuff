@@ -265,11 +265,11 @@ export default class CommandParser
                 if(str === ".") return;
                 if(str === cwd) return;
 
-                if(str[0] === "~")
+                if(str.charAt(0) === "~")
                 {
                     str = HOME + str.substring(1);
                 }
-                if(cwd[0] === "~")
+                if(cwd.charAt(0) === "~")
                 {
                     cwd = HOME + cwd.substring(1);
                 }
