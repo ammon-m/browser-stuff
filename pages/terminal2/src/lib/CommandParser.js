@@ -255,7 +255,7 @@ export default class CommandParser
 
                 if(str.length == 0)
                 {
-                    global.cwd = "~";
+                    global.cwd = "~/";
                     return;
                 }
 
