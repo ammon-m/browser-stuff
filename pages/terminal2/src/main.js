@@ -18,7 +18,7 @@ globalThis.InputState = {
 globalThis.global = {
     user: "user",
     device: "Conch",
-    cwd: "~",
+    cwd: "~/",
     canType: true,
     echo: true,
     theme: Object.freeze(ThemeColorSet.Default),
