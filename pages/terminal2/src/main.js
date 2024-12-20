@@ -407,8 +407,10 @@ async function receiveUserCommand(value)
                 terminal.SetColor(global.theme.foreground)
                 terminal.Write(":")
 
+                let path = global.cwd;
+                if(path.length > 1 && path[path.length - 1] === "/") path = path.substring(0, path.length - 1);
                 terminal.SetColor(global.theme.path)
-                terminal.Write(global.cwd)
+                terminal.Write(path)
 
                 terminal.SetColor(global.theme.foreground)
                 terminal.Write("$ ")
@@ -561,7 +563,10 @@ function drawCanvas()
 
             break;
         case InputState.Command: default:
-            len = (global.user + "@" + global.device + ":" + global.cwd + "$ ").length
+            let path = global.cwd;
+            if(path.length > 1 && path[path.length - 1] === "/") path = path.substring(0, path.length - 1);
+
+            len = (global.user + "@" + global.device + ":" + path + "$ ").length
 
             cursorCtx.fillStyle = theme.user;
             cursorCtx.fillText(global.user + "@" + global.device, x * charWidth + xPadding, y * lineHeight);
@@ -571,8 +576,6 @@ function drawCanvas()
             cursorCtx.fillText(":", x * charWidth + xPadding, y * lineHeight);
             x++
 
-            let path = global.cwd;
-            if(path.length > 1 && path[path.length - 1] === "/") path = path.substring(0, path.length - 1);
             cursorCtx.fillStyle = theme.path;
             cursorCtx.fillText(path, x * charWidth + xPadding, y * lineHeight);
             x += path.length
