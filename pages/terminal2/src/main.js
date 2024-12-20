@@ -316,8 +316,8 @@ async function init(motd)
 
     mainElement.addEventListener("contextmenu", event => {
         contextMenuElement.classList.remove("hidden");
-        contextMenuElement.style.left = Math.min(event.clientX - 8, window.innerWidth - 8 - contextMenuElement.clientWidth) + "px";
-        contextMenuElement.style.top = Math.min(event.clientY - 10, window.innerHeight - 8 - contextMenuElement.clientWidth) + "px";
+        contextMenuElement.style.left = Math.min(event.clientX - 8, window.innerWidth - 10 - contextMenuElement.clientWidth) + "px";
+        contextMenuElement.style.top = Math.min(event.clientY - 10, window.innerHeight - 10 - contextMenuElement.clientHeight) + "px";
         consoleFocused = false;
         unfocusable = false;
         drawCanvas();
