@@ -78,7 +78,7 @@ export default class Terminal
     ResetColor()
     {
         this._drawingState.fgColor = Terminal.Colors.foreground;
-        ResetBackgroundColor();
+        this.ResetBackgroundColor();
     }
 
     GetBackgroundColor()
